@@ -1,4 +1,5 @@
 pub mod procedural;
+use crate::terrain::land;
 use crate::{math::*, renderer::Fragment, scene::Scene};
 use procedural::{Noise, mix, rgb, smooth};
 use std::f32::consts::{PI, TAU};
@@ -193,90 +194,12 @@ impl Materials {
         v(color.x.max(0.), color.y.max(0.), color.z.max(0.))
     }
 }
-fn polygon(x: f32, y: f32, points: &[(f32, f32)]) -> bool {
-    let mut inside = false;
-    let mut j = points.len() - 1;
-    for i in 0..points.len() {
-        let (a, b) = points[i];
-        let (c, d) = points[j];
-        if (b > y) != (d > y) && x < (c - a) * (y - b) / (d - b) + a {
-            inside = !inside;
-        }
-        j = i;
-    }
-    inside
-}
-fn land(lon: f32, lat: f32) -> bool {
-    const NA: &[(f32, f32)] = &[
-        (-168., 70.),
-        (-140., 60.),
-        (-125., 48.),
-        (-117., 32.),
-        (-100., 16.),
-        (-83., 10.),
-        (-80., 26.),
-        (-60., 47.),
-        (-54., 60.),
-        (-80., 73.),
-        (-110., 77.),
-    ];
-    const SA: &[(f32, f32)] = &[
-        (-80., 10.),
-        (-62., 10.),
-        (-35., -8.),
-        (-45., -25.),
-        (-68., -56.),
-        (-75., -35.),
-    ];
-    const AFR: &[(f32, f32)] = &[
-        (-17., 35.),
-        (10., 38.),
-        (33., 30.),
-        (51., 10.),
-        (40., -15.),
-        (20., -35.),
-        (8., -25.),
-        (-6., 5.),
-        (-17., 15.),
-    ];
-    const EURASIA: &[(f32, f32)] = &[
-        (-10., 36.),
-        (-10., 58.),
-        (20., 70.),
-        (75., 75.),
-        (140., 65.),
-        (179., 67.),
-        (179., 52.),
-        (140., 45.),
-        (130., 25.),
-        (108., 0.),
-        (98., 15.),
-        (80., 8.),
-        (65., 25.),
-        (40., 35.),
-        (30., 42.),
-        (15., 37.),
-    ];
-    const AUS: &[(f32, f32)] = &[
-        (113., -22.),
-        (130., -11.),
-        (145., -14.),
-        (153., -28.),
-        (142., -39.),
-        (115., -34.),
-    ];
-    polygon(lon, lat, NA)
-        || polygon(lon, lat, SA)
-        || polygon(lon, lat, AFR)
-        || polygon(lon, lat, EURASIA)
-        || polygon(lon, lat, AUS)
-        || ((lon + 42.) / 18.).powi(2) + ((lat - 74.) / 10.).powi(2) < 1.
-}
 fn earth(p: V3, normal: V3, light: V3, view: V3, time: f32, n: &Noise) -> V3 {
     let r = (p.x * p.x + p.z * p.z).sqrt();
     let day = normal.dot(light).max(0.);
     if p.y < 0.04 {
-        let grain = n.sample(p * 30.) * 0.5 + 0.5;
+        let grain =
+            n.sample(p * 30.) * 0.3 + 0.35 + 0.2 * (p.y * 120. + n.sample(p * 8.) * 3.).sin();
         return mix(rgb(0x141a28), rgb(0x5a6171), grain) * (0.38 + 0.62 * day);
     }
     let lon = p.z.atan2(p.x).to_degrees();
@@ -291,8 +214,8 @@ fn earth(p: V3, normal: V3, light: V3, view: V3, time: f32, n: &Noise) -> V3 {
         mix(rgb(0x065078), rgb(0x147eaa), n.sample(p * 19.) * 0.5 + 0.5)
     };
     let cloud = smooth(
-        0.25,
-        0.65,
+        -0.15,
+        0.4,
         n.sample(v(p.x * 13. + time * 0.022, p.z * 13., time * 0.01)),
     ) * (0.55 + 0.45 * (p.z * 60. + n.sample(p * 17.) * 3.).sin());
     let spec = normal.dot(unit(light + view)).max(0.).powf(50.) * if ground { 0.05 } else { 0.5 };

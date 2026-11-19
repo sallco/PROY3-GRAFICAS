@@ -131,7 +131,7 @@ pub fn disk(segments: usize, rings: usize) -> Mesh {
             for i in 0..segments {
                 let a = i as f32 / segments as f32 * std::f32::consts::TAU;
                 let h = if side == 0 {
-                    0.07 + 0.055 * (a * 9.).sin().abs() * r.powi(8)
+                    crate::terrain::flat_height(v(r * a.cos(), 0., r * a.sin()))
                 } else {
                     -0.17 - 0.18 * (1. - r * r) + 0.018 * (a * 13.).sin() * r
                 };
