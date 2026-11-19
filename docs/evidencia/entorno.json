@@ -14,34 +14,34 @@
     {
       "lod": false,
       "culling": false,
-      "mean_ms": 24.083,
-      "p95_ms": 32.63,
-      "fps_cpu": 41.52,
-      "mean_triangles": 38884
+      "mean_ms": 26.439,
+      "p95_ms": 35.887,
+      "fps_cpu": 37.82,
+      "mean_triangles": 106660
     },
     {
       "lod": false,
       "culling": true,
-      "mean_ms": 22.344,
-      "p95_ms": 31.694,
-      "fps_cpu": 44.75,
-      "mean_triangles": 12090
+      "mean_ms": 22.417,
+      "p95_ms": 36.403,
+      "fps_cpu": 44.61,
+      "mean_triangles": 31752
     },
     {
       "lod": true,
       "culling": false,
-      "mean_ms": 21.584,
-      "p95_ms": 30.281,
-      "fps_cpu": 46.33,
-      "mean_triangles": 14861
+      "mean_ms": 21.506,
+      "p95_ms": 28.681,
+      "fps_cpu": 46.5,
+      "mean_triangles": 43162
     },
     {
       "lod": true,
       "culling": true,
-      "mean_ms": 21.221,
-      "p95_ms": 29.797,
-      "fps_cpu": 47.12,
-      "mean_triangles": 6906
+      "mean_ms": 20.511,
+      "p95_ms": 27.682,
+      "fps_cpu": 48.75,
+      "mean_triangles": 16830
     }
   ]
 }

@@ -40,7 +40,8 @@ Presentación escalada e interfaz 2D
 | `flight` | Pasos fijos, aceleración, orientación, gravedad, cámara, colisiones y estados de viaje. |
 | `renderer` | Clipping, visibilidad, rasterización, profundidad y sombreado paralelo. |
 | `shaders` / `terrain` | Materiales, mapa normal y geografía del disco. |
-| `sky` | Skybox cúbico, halo, warping y aproximación visual de Umbra. |
+| `sky` / `glow` | Skybox cúbico, halo, bloom solar, warping y aproximación visual de Umbra. |
+| `flat_collision` | Barrido contra la base cónica, el borde y la tapa del disco. |
 | `app` / `main` | Composición del cuadro, ventana, interfaz, configuración y modos de ejecución. |
 | `demo` | Recorrido reproducible y transmisión de cuadros a FFmpeg. |
 
@@ -52,11 +53,11 @@ Los OBJ se cargan con índices positivos y caras trianguladas. El parser valida 
 
 Cada comando de dibujo contiene malla, transformación uniforme, identificador de material, objeto, radio envolvente y política de caras. La transformación mantiene una base ortonormal; su operación inversa recupera coordenadas locales. La cámara obtiene una base desde ojo, objetivo y dirección superior y construye las coordenadas homogéneas de perspectiva sin recurrir a una cámara 3D de Raylib.
 
-La esfera base tiene 192 triángulos. La subdivisión comparte puntos medios de aristas y los proyecta a la esfera unitaria. Los niveles planetarios tienen **192, 768 y 3072 triángulos**. Obsidia deforma cada nivel con el mismo campo de ruido y recalcula las normales. Esta deformación cambia la silueta y es independiente del detalle aparente de materiales.
+La esfera base tiene 192 triángulos. La subdivisión comparte puntos medios de aristas y los proyecta a la esfera unitaria. Los cuatro niveles esféricos tienen **192, 768, 3072 y 12 288 triángulos**; el último se activa durante el acercamiento. Cada mundo sólido deforma sus niveles con un campo propio. Obsidia combina macizos de baja frecuencia, crestas y conos con calderas; Mneme presenta colinas suaves; Prisma, plataformas heladas; Palimpsesto, dunas y una cuenca salina. Se recalculan las normales y se utiliza el mismo campo para anclar las instancias. Esta deformación cambia la silueta y es independiente del detalle aparente de materiales.
 
-Tierra Plana utiliza anillos concéntricos, segmentos angulares, cara superior, pared y base. Sus tres niveles tienen distinta resolución angular y radial. La geografía se define en coordenadas polares: la latitud depende del radio y la longitud del ángulo. Los mismos polígonos continentales alimentan el material y el relieve geométrico. El borde y los estratos inferiores completan el volumen.
+Tierra Plana utiliza anillos concéntricos, segmentos angulares, cara superior, pared y base cónica puntiaguda. Sus tres niveles tienen distinta resolución angular y radial. La geografía se define en coordenadas polares: la latitud depende del radio y la longitud del ángulo. Los mismos polígonos continentales alimentan el material y el relieve geométrico. El borde y los estratos inferiores completan el volumen.
 
-Los cuatro tipos de modelos de superficie se generan en CPU. Se ubican sobre candidatos distribuidos mediante ángulo áureo, filtrados por OpenSimplex. La semilla modifica máscara y escala. Cada instancia almacena una posición y una base locales; al dibujarla, la transformación del planeta transporta ambas. En el cuerpo deformado se estima la normal de la superficie mediante diferencias finitas.
+Los cuatro tipos de modelos de superficie se generan en CPU. Se ubican sobre candidatos distribuidos mediante ángulo áureo, priorizados y filtrados por OpenSimplex antes de limitar su cantidad. Esto conserva cobertura sobre ambos hemisferios; los árboles se restringen al bioma vegetal y los pórticos evitan el centro salino. La semilla modifica ubicaciones y escala. Cada instancia almacena una posición y una base locales; al dibujarla, la transformación del planeta transporta ambas. En el cuerpo deformado se estima la normal de la superficie mediante diferencias finitas.
 
 ## Recorte, profundidad y materiales
 
@@ -66,9 +67,9 @@ La rasterización evalúa coordenadas baricéntricas y limita el recorrido al re
 
 El rasterizador conserva únicamente el fragmento más cercano de cada píxel. El sombreado posterior divide la imagen entre hasta ocho hilos con regiones exclusivas de memoria. No se necesitan bloqueos para escribir colores. Los fragmentos interpolados transportan posición local, posición global, normal e identificadores de objeto/material.
 
-El mapa normal se genera al inicio, a 128 × 64, a partir de derivadas de un campo procedural sobre la esfera. Se muestrea mediante UV esféricas, interpolación bilineal y repetición horizontal. Una base tangente transforma las normales muestreadas al espacio global; los polos utilizan un eje alternativo estable. `F6` permite aislar su contribución. No se presenta este efecto como deformación geométrica.
+El mapa normal se genera al inicio, a 256 × 128, a partir de derivadas de un campo procedural sobre la esfera. Se muestrea mediante UV esféricas, interpolación bilineal y repetición horizontal. Una base tangente transforma las normales muestreadas al espacio global; los polos utilizan un eje alternativo estable. `F6` permite aislar su contribución. No se presenta este efecto como deformación geométrica.
 
-La estrella emite luz visual propia. Los planetas y la nave reciben iluminación desde el origen estelar, con contribución ambiental estilizada y respuestas especulares según material. Mneme y Obsidia incorporan emisión; Artaud deforma coordenadas para su vórtice. La animación de materiales usa tiempo simulado.
+La estrella presenta granulación animada blanca y dorada y un halo cálido. Un bloom de tres pasadas separables, calculado en CPU a un cuarto de resolución, usa únicamente fragmentos solares visibles. Respeta la profundidad y no modifica los objetos que ocultan el sol. Los planetas y la nave reciben iluminación desde el origen estelar, con contribución ambiental estilizada y respuestas especulares según material. Mneme y Obsidia incorporan emisión; Artaud deforma coordenadas para su vórtice. La animación de materiales usa tiempo simulado.
 
 ## Cielo y núcleo galáctico
 
@@ -90,7 +91,7 @@ La cámara sigue a la nave con amortiguación exponencial y puede cambiar de ori
 
 La nave utiliza una esfera de radio 0,32. Las pruebas se realizan sobre el segmento completo de movimiento respecto al centro anterior y actual del cuerpo. Se resuelve el primer impacto y se elimina la componente de velocidad que penetra la superficie. La protección de cámara utiliza el mismo sistema con margen propio.
 
-Los planetas usan esferas conservadoras; Obsidia añade un margen del 8 % para su relieve. Los modelos de superficie emplean esferas conservadoras individuales. Tierra Plana utiliza un cilindro expandido, con pruebas contra tapas y pared: el margen cubre relieve y base. La resolución interior expulsa por una salida del volumen. El sol y la zona de seguridad de Umbra también bloquean la navegación.
+Los planetas usan esferas conservadoras; Obsidia usa una envolvente de 1,38 radios nominales para cubrir el relieve pronunciado; los otros sólidos usan sus límites propios. Los modelos de superficie emplean esferas conservadoras individuales. Tierra Plana utiliza la intersección de un cono, una pared cilíndrica y una tapa superior, expandidos por el radio de la nave. La prueba barre el segmento contra las tres superficies; el discriminante se calcula en doble precisión para conservar impactos sobre la punta. El espacio vacío bajo el borde permanece transitable. La resolución interior expulsa por la frontera más próxima. El sol y la zona de seguridad de Umbra también bloquean la navegación.
 
 Los límites no pretenden reproducir contacto exacto con cada triángulo. No se permite aterrizar. Los anillos de Artaud y las copas anulares son elementos decorativos sin colisión independiente.
 
@@ -108,17 +109,17 @@ Medición del 19 de noviembre de 2026, AMD Ryzen 7 7445HS, 12 procesadores lógi
 
 | LOD | Descarte | Media CPU | Percentil 95 | FPS CPU equivalentes | Triángulos procesados/cuadro |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Desactivado | Desactivado | 24,08 ms | 32,63 ms | 41,5 | 38 884 |
-| Desactivado | Activado | 22,34 ms | 31,69 ms | 44,8 | 12 090 |
-| Activado | Desactivado | 21,58 ms | 30,28 ms | 46,3 | 14 861 |
-| Activado | Activado | 21,22 ms | 29,80 ms | 47,1 | 6906 |
+| Desactivado | Desactivado | 26,44 ms | 35,89 ms | 37,82 | 106 660 |
+| Desactivado | Activado | 22,42 ms | 36,40 ms | 44,61 | 31 752 |
+| Activado | Desactivado | 21,51 ms | 28,68 ms | 46,50 | 43 162 |
+| Activado | Activado | 20,51 ms | 27,68 ms | 48,75 | 16 830 |
 
-La combinación reduce aproximadamente un 82 % los triángulos procesados frente a detalle alto sin descarte. La mejora de tiempo es menor porque el costo del cielo y del sombreado de píxeles visibles permanece. Los FPS de esta tabla son el inverso del tiempo medio CPU, no una medición de la presentación gráfica.
+La combinación reduce aproximadamente un 84 % los triángulos procesados frente a detalle alto sin descarte. La mejora de tiempo es menor porque el costo del cielo y del sombreado de píxeles visibles permanece. Los FPS de esta tabla son el inverso del tiempo medio CPU, no una medición de la presentación gráfica.
 
 El [CSV](evidencia/benchmark.csv) conserva las muestras y [el entorno registrado](evidencia/entorno.json) acompaña los resultados. Los valores dependen de carga del sistema, compilador, resolución y encuadre; no se extrapolan a otros equipos. Las métricas interactivas separan tiempo CPU y FPS de presentación.
 
 ## Verificación
 
-Las pruebas automatizadas comprueban lógica y resultados observables: visibilidad conservada por el descarte, profundidad independiente del orden, colisiones barridas, reproducibilidad y equivalencia de navegación a distintas frecuencias de presentación. La revisión visual utiliza las capturas incluidas y el video. La ventana real se abrió en XWayland y recibió entradas de teclado para comprobar interfaz, comparaciones y transición galáctica; cerró con código 0. La prueba de resistencia cubre diez minutos de tiempo simulado, no diez minutos de evaluación manual.
+Las pruebas automatizadas comprueban lógica y resultados observables: visibilidad conservada por el descarte, profundidad independiente del orden, colisiones barridas esféricas y cónicas, resplandor con oclusión, límites de relieve, cobertura de ambos hemisferios, reproducibilidad y equivalencia de navegación a distintas frecuencias de presentación. La revisión visual utiliza las capturas incluidas y el video. La ventana real se abrió en XWayland y recibió entradas de teclado para comprobar interfaz, comparaciones y transición galáctica; cerró con código 0. La prueba de resistencia cubre diez minutos de tiempo simulado, no diez minutos de evaluación manual.
 
 El alcance no incluye aterrizaje, caminata, combate, cuerpos que colisionen entre sí, sombras geométricas completas ni relatividad general.
