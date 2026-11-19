@@ -7,3 +7,4 @@ pub mod obj;
 pub mod renderer;
 pub mod scene;
 pub mod shaders;
+pub mod sky;
