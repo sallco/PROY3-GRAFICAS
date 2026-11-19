@@ -92,16 +92,19 @@ impl Museum {
             _ => "Nave",
         }
     }
-    pub fn description(&self) -> &str {
-        match self.selected {
-            0 => "Granulacion, emision y resplandor solar.",
-            1 => "Bosque anular y lagunas violetas.",
-            2 => "Relieve fracturado y lava en movimiento.",
-            3 => "Glaciares blancos y cristales facetados.",
-            4 => "Bandas atmosfericas, tormenta y anillos.",
-            5 => "Dunas, cuenca salina y observatorios.",
-            6 => "Continentes, nubes y base conica.",
-            _ => "Modelo original y malla de vuelo.",
+    pub fn description(&self, scene: &Scene) -> &str {
+        use crate::config::Kind;
+        match self.exhibit() {
+            Exhibit::Sun => "Granulacion, emision y resplandor solar.",
+            Exhibit::Ship => "Modelo original y malla de vuelo.",
+            Exhibit::Planet(i) => match scene.config.worlds[i].kind {
+                Kind::Forest => "Bosque anular y lagunas violetas.",
+                Kind::Volcanic => "Relieve fracturado y lava en movimiento.",
+                Kind::Ice => "Glaciares blancos y cristales facetados.",
+                Kind::Gas => "Bandas atmosfericas, tormenta y anillos.",
+                Kind::Desert => "Dunas, cuenca salina y observatorios.",
+                Kind::Flat => "Continentes, nubes y base conica.",
+            },
         }
     }
     pub fn center_radius(&self, scene: &Scene) -> (V3, f32) {
@@ -124,7 +127,12 @@ impl Museum {
         };
         let horizontal = rotate_y(base, self.yaw) * self.pitch.cos();
         let direction = unit(horizontal + v(0., self.pitch.sin(), 0.));
-        let mut camera = Camera::new(center + direction * (radius * 3.4), center);
+        let fit_distance = if self.exhibit() == Exhibit::Ship {
+            2.2
+        } else {
+            3.4
+        };
+        let mut camera = Camera::new(center + direction * (radius * fit_distance), center);
         let (right, up, _) = camera.basis();
         let offset = (right * self.pan.x + up * self.pan.y) * radius;
         camera.eye += offset;

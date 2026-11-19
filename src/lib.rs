@@ -14,3 +14,4 @@ pub mod scene;
 pub mod shaders;
 pub mod sky;
 pub mod terrain;
+pub mod ui;
