@@ -131,7 +131,7 @@ pub fn disk(segments: usize, rings: usize) -> Mesh {
                 let h = if side == 0 {
                     0.07 + 0.055 * (a * 9.).sin().abs() * r.powi(8)
                 } else {
-                    -0.17 - 0.18 * (1. - r * r) + 0.018 * (a * 13.).sin()
+                    -0.17 - 0.18 * (1. - r * r) + 0.018 * (a * 13.).sin() * r
                 };
                 m.vertices.push(Vertex {
                     position: v(r * a.cos(), h, r * a.sin()),
@@ -146,12 +146,19 @@ pub fn disk(segments: usize, rings: usize) -> Mesh {
                 let c = a + segments;
                 let d = b + segments;
                 let ts = if side == 0 {
-                    [[a, c, b], [b, c, d]]
-                } else {
                     [[a, b, c], [b, d, c]]
+                } else {
+                    [[a, c, b], [b, c, d]]
                 };
-                m.triangles
-                    .extend(ts.into_iter().filter(|t| j != 0 || t[0] != a || side == 0));
+                for [a, b, c] in ts {
+                    let pa = m.vertices[a].position;
+                    let pb = m.vertices[b].position;
+                    let pc = m.vertices[c].position;
+                    let cross = (pb - pa).cross(pc - pa);
+                    if cross.dot(cross) > 1e-12 {
+                        m.triangles.push([a, b, c]);
+                    }
+                }
             }
         }
     }
@@ -161,7 +168,7 @@ pub fn disk(segments: usize, rings: usize) -> Mesh {
         let b = rings * segments + (i + 1) % segments;
         let c = a + bottom;
         let d = b + bottom;
-        m.triangles.extend([[a, b, c], [b, d, c]]);
+        m.triangles.extend([[a, c, b], [b, c, d]]);
     }
     m.recalculate_normals();
     m
@@ -256,4 +263,27 @@ pub fn surface_models() -> Vec<Mesh> {
     ];
     monolith.recalculate_normals();
     vec![tree, basalt, ice, monolith]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn disk_normals_face_outward() {
+        let m = disk(32, 8);
+        for p in &m.vertices {
+            if p.position.x.abs() < 0.5 && p.position.z.abs() < 0.5 {
+                if p.position.y > 0. {
+                    assert!(p.normal.y > 0.5);
+                } else {
+                    assert!(p.normal.y < -0.5);
+                }
+            }
+        }
+        assert!(m.triangles.iter().all(|&[a, b, c]| {
+            let n = (m.vertices[b].position - m.vertices[a].position)
+                .cross(m.vertices[c].position - m.vertices[a].position);
+            n.dot(n) > 1e-12
+        }));
+    }
 }
