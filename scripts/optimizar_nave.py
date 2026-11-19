@@ -5,7 +5,11 @@ import bpy
 root = Path(__file__).resolve().parents[1]
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
-bpy.ops.wm.obj_import(filepath=str(root / "assets/models/nave-original.obj"))
+bpy.ops.wm.obj_import(
+    filepath=str(root / "assets/models/nave-original.obj"),
+    forward_axis="Y",
+    up_axis="Z",
+)
 objects = [obj for obj in bpy.context.selected_objects if obj.type == "MESH"]
 for obj in objects:
     bpy.context.view_layer.objects.active = obj

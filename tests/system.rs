@@ -368,3 +368,31 @@ fn animated_materials_change_at_fixed_geometry() {
         assert!(change > 0.2, "material {material}: {change}");
     }
 }
+
+#[test]
+fn optimized_ship_preserves_original_axis_convention() {
+    let mut original = Mesh::load(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/models/nave-original.obj"),
+    )
+    .unwrap();
+    original.normalize();
+    let extent = |mesh: &Mesh, axis: usize| {
+        let value = |p: &Vertex| match axis {
+            0 => p.position.x,
+            1 => p.position.y,
+            _ => p.position.z,
+        };
+        mesh.vertices
+            .iter()
+            .map(value)
+            .fold(f32::NEG_INFINITY, f32::max)
+            - mesh
+                .vertices
+                .iter()
+                .map(value)
+                .fold(f32::INFINITY, f32::min)
+    };
+    for axis in 0..3 {
+        assert!((extent(&original, axis) - extent(&scene().ship, axis)).abs() < 0.15);
+    }
+}
