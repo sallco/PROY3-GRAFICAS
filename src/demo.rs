@@ -60,7 +60,7 @@ pub fn record(app: &mut App, output: &Path) -> Result<(), Box<dyn std::error::Er
         (52, 58, "05 / PRISMA - HIELO Y CRISTALES"),
         (58, 64, "06 / ARTAUD - BANDAS Y VORTICE"),
         (64, 70, "07 / PALIMPSESTO - OBSERVATORIOS"),
-        (70, 76, "08 / TIERRA PLANA - OCEANOS Y BORDE HELADO"),
+        (70, 76, "08 / TIERRA PLANA - SUPERFICIE Y BASE CONICA"),
         (76, 79, "09 / SALTO AL NUCLEO GALACTICO"),
         (79, 90, "10 / UMBRA - VUELO EN EL NUCLEO"),
         (90, 93, "11 / RETORNO AL SISTEMA"),
@@ -131,6 +131,11 @@ pub fn record(app: &mut App, output: &Path) -> Result<(), Box<dyn std::error::Er
                 let mut c = base;
                 let a = (t - 46.).rem_euclid(6.) * 0.09 - 0.27;
                 c.eye = center + rotate_y(base.eye - center, a);
+                if i == 5 {
+                    let progress = ((t - 70.) / 6.).clamp(0., 1.);
+                    let ease = progress * progress * (3. - 2. * progress);
+                    c.eye.y = center.y + app.scene.config.worlds[i].radius * (1.15 - 2.3 * ease);
+                }
                 app.render_view(c, None, false, time, None);
                 app.flight.time = time;
             } else {
