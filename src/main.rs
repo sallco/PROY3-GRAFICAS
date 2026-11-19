@@ -3,7 +3,7 @@ use nadir::{
     config::Config,
     flight::{Input, Region},
     geometry::surface_models,
-    math::{Camera, V3, v},
+    math::{Camera, Transform, V3, v},
     scene::Scene,
 };
 use raylib::prelude::*;
@@ -104,6 +104,19 @@ fn captures(app: &mut App, output: &Path) -> Result<(), Box<dyn std::error::Erro
     let c = app.flight.camera;
     app.render_view(c, None, false, 12., Some(1.1));
     app.fb.export_png(&output.join("warping.png"))?;
+    let mut original = nadir::geometry::Mesh::load(
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/models/nave-original.obj"),
+    )?;
+    original.normalize();
+    let center = v(0., 7., 35.);
+    let camera = Camera::new(center + v(2., 1.7, 4.3), center);
+    let transform = Transform::new(center, 1.4, 0.5);
+    app.render_view(camera, Some(transform), true, 12., None);
+    app.fb.export_png(&output.join("nave-vuelo.png"))?;
+    let optimized = std::mem::replace(&mut app.scene.ship, original);
+    app.render_view(camera, Some(transform), true, 12., None);
+    app.fb.export_png(&output.join("nave-original.png"))?;
+    app.scene.ship = optimized;
     Ok(())
 }
 fn benchmark(app: &mut App, output: &Path) -> Result<(), Box<dyn std::error::Error>> {

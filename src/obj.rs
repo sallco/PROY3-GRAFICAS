@@ -72,6 +72,23 @@ impl Obj {
                 "Una cara referencia un vértice inexistente",
             ));
         }
+        // El exportador puede conservar vértices sin caras; no participan del modelo.
+        let mut used = vec![false; vertices.len()];
+        for &index in &indices {
+            used[index] = true;
+        }
+        let mut remap = vec![0; vertices.len()];
+        let mut compact = Vec::with_capacity(vertices.len());
+        for (index, vertex) in vertices.into_iter().enumerate() {
+            if used[index] {
+                remap[index] = compact.len();
+                compact.push(vertex);
+            }
+        }
+        let vertices = compact;
+        for index in &mut indices {
+            *index = remap[*index];
+        }
         let mut normals = vec![Vector3::zero(); vertices.len()];
         for &[a, b, c] in indices.as_chunks::<3>().0 {
             let normal = (vertices[b] - vertices[a]).cross(vertices[c] - vertices[a]);

@@ -301,3 +301,13 @@ fn pause_freezes_translation_but_keeps_orientation_available() {
     assert_eq!(f.ship.position, position);
     assert!((f.ship.forward - forward).length() > 0.1);
 }
+
+#[test]
+fn original_ship_loads_without_unused_export_vertices() {
+    let mesh = Mesh::load(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/models/nave-original.obj"),
+    )
+    .unwrap();
+    assert_eq!(mesh.triangles.len(), 116480);
+    assert_eq!(mesh.vertices.len(), 58324);
+}
