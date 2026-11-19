@@ -7,6 +7,7 @@ pub mod framebuffer;
 pub mod geometry;
 pub mod glow;
 pub mod math;
+pub mod museum;
 pub mod obj;
 pub mod renderer;
 pub mod scene;

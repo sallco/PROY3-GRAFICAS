@@ -18,6 +18,7 @@ pub struct Scene {
     pub flat: Vec<Mesh>,
     pub models: Vec<Mesh>,
     pub ship: Mesh,
+    pub original_ship: Mesh,
     pub rings: Mesh,
     pub instances: Vec<Vec<Instance>>,
     pub noise: Noise,
@@ -53,6 +54,8 @@ impl Scene {
                     .collect()
             })
             .collect();
+        let mut original_ship = Mesh::load(root.join("nave-original.obj"))?;
+        original_ship.normalize();
         let ship_path = root.join("nave-vuelo.obj");
         let mut ship = Mesh::load(if ship_path.exists() {
             ship_path
@@ -73,6 +76,7 @@ impl Scene {
             flat: vec![disk(32, 8), disk(64, 16), disk(128, 32)],
             models: surface_models(),
             ship,
+            original_ship,
             rings: {
                 let mut rings = Mesh::default();
                 for (inner, outer) in [(1.27, 1.43), (1.49, 1.63), (1.71, 1.85)] {
@@ -134,55 +138,7 @@ impl Scene {
                 double_sided: false,
             });
             for i in 0..self.config.worlds.len() {
-                let w = &self.config.worlds[i];
-                let level = self.levels[i];
-                let transform = self.transform(i, time);
-                let mesh = match w.kind {
-                    Kind::Flat => &self.flat[level.min(2)],
-                    _ => &self.terrain_meshes[i][level],
-                };
-                calls.push(DrawCall {
-                    mesh,
-                    transform,
-                    material: w.kind.material(),
-                    object: i,
-                    radius: w.radius * crate::terrain::surface_bound(w.kind),
-                    double_sided: false,
-                });
-                if w.kind == Kind::Gas {
-                    let mut rt = transform;
-                    let (s, c) = 0.35_f32.sin_cos();
-                    rt.y = v(0., c, s);
-                    rt.z = unit(rt.x.cross(rt.y));
-                    calls.push(DrawCall {
-                        mesh: &self.rings,
-                        transform: rt,
-                        material: 8,
-                        object: i,
-                        radius: w.radius * 1.9,
-                        double_sided: true,
-                    });
-                }
-                if level > 0 {
-                    for instance in &self.instances[i] {
-                        let local = instance.transform;
-                        let global = Transform {
-                            position: transform.point(local.position),
-                            x: transform.vector(local.x),
-                            y: transform.vector(local.y),
-                            z: transform.vector(local.z),
-                            scale: local.scale,
-                        };
-                        calls.push(DrawCall {
-                            mesh: &self.models[instance.model],
-                            transform: global,
-                            material: 9 + instance.model,
-                            object: i,
-                            radius: local.scale * 2.,
-                            double_sided: true,
-                        });
-                    }
-                }
+                self.add_body_calls(&mut calls, i, time, self.levels[i]);
             }
         }
         if let Some(transform) = ship {
@@ -194,6 +150,95 @@ impl Scene {
                 radius: transform.scale,
                 double_sided: false,
             });
+        }
+        calls
+    }
+    fn add_body_calls<'a>(
+        &'a self,
+        calls: &mut Vec<DrawCall<'a>>,
+        i: usize,
+        time: f64,
+        level: usize,
+    ) {
+        let w = &self.config.worlds[i];
+        let transform = self.transform(i, time);
+        let mesh = match w.kind {
+            Kind::Flat => &self.flat[level.min(2)],
+            _ => &self.terrain_meshes[i][level],
+        };
+        calls.push(DrawCall {
+            mesh,
+            transform,
+            material: w.kind.material(),
+            object: i,
+            radius: w.radius * crate::terrain::surface_bound(w.kind),
+            double_sided: false,
+        });
+        if w.kind == Kind::Gas {
+            let mut rt = transform;
+            let (s, c) = 0.35_f32.sin_cos();
+            rt.y = v(0., c, s);
+            rt.z = unit(rt.x.cross(rt.y));
+            calls.push(DrawCall {
+                mesh: &self.rings,
+                transform: rt,
+                material: 8,
+                object: i,
+                radius: w.radius * 1.9,
+                double_sided: true,
+            });
+        }
+        if level > 0 {
+            for instance in &self.instances[i] {
+                let local = instance.transform;
+                let global = Transform {
+                    position: transform.point(local.position),
+                    x: transform.vector(local.x),
+                    y: transform.vector(local.y),
+                    z: transform.vector(local.z),
+                    scale: local.scale,
+                };
+                calls.push(DrawCall {
+                    mesh: &self.models[instance.model],
+                    transform: global,
+                    material: 9 + instance.model,
+                    object: i,
+                    radius: local.scale * 2.,
+                    double_sided: true,
+                });
+            }
+        }
+    }
+    pub fn exhibit_calls(
+        &self,
+        exhibit: crate::museum::Exhibit,
+        time: f64,
+        original_ship: bool,
+    ) -> Vec<DrawCall<'_>> {
+        use crate::museum::Exhibit;
+        let mut calls = Vec::new();
+        match exhibit {
+            Exhibit::Sun => calls.push(DrawCall {
+                mesh: self.spheres.last().unwrap(),
+                transform: Transform::new(V3::zero(), self.config.star_radius, time as f32 * 0.04),
+                material: 0,
+                object: usize::MAX,
+                radius: self.config.star_radius,
+                double_sided: false,
+            }),
+            Exhibit::Planet(i) => self.add_body_calls(&mut calls, i, time, self.spheres.len() - 1),
+            Exhibit::Ship => calls.push(DrawCall {
+                mesh: if original_ship {
+                    &self.original_ship
+                } else {
+                    &self.ship
+                },
+                transform: Transform::new(v(-20., 0., 0.), 2., 0.),
+                material: 7,
+                object: usize::MAX,
+                radius: 2.,
+                double_sided: false,
+            }),
         }
         calls
     }
