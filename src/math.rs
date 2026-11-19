@@ -4,7 +4,7 @@ pub fn v(x: f32, y: f32, z: f32) -> V3 {
     V3::new(x, y, z)
 }
 pub fn unit(a: V3) -> V3 {
-    if a.length_sqr() < 1e-12 {
+    if a.dot(a) < 1e-12 {
         v(0., 1., 0.)
     } else {
         a.normalized()
