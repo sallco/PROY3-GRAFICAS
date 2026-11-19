@@ -278,3 +278,26 @@ fn lod_reduces_geometry_at_distance() {
         .sum();
     assert!(low < high / 2);
 }
+
+#[test]
+fn pause_freezes_translation_but_keeps_orientation_available() {
+    let s = scene();
+    let mut f = Flight::new(s);
+    f.paused = true;
+    let position = f.ship.position;
+    let forward = f.ship.forward;
+    for _ in 0..60 {
+        f.advance(
+            s,
+            1. / 60.,
+            Input {
+                yaw: 0.5,
+                thrust: 1.,
+                ..Input::default()
+            },
+        );
+    }
+    assert_eq!(f.time, 0.);
+    assert_eq!(f.ship.position, position);
+    assert!((f.ship.forward - forward).length() > 0.1);
+}

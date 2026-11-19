@@ -22,6 +22,21 @@ pub struct Ship {
     pub angular: V3,
 }
 impl Ship {
+    fn orient(&mut self, input: Input, radial: Option<V3>, dt: f32) {
+        let reference = radial.unwrap_or(self.up);
+        let desired_angular = v(input.pitch, input.yaw, input.roll) * 1.4;
+        self.angular += (desired_angular - self.angular) * (1. - (-dt * 7.).exp());
+        let right = unit(self.forward.cross(self.up));
+        self.forward = unit(rotate(self.forward, reference, -self.angular.y * dt));
+        self.forward = unit(rotate(self.forward, right, self.angular.x * dt));
+        self.up = unit(rotate(self.up, right, self.angular.x * dt));
+        self.up = unit(rotate(self.up, self.forward, self.angular.z * dt));
+        if let Some(radial) = radial {
+            self.up = unit(self.up + (radial - self.up) * (1. - (-dt * 1.5).exp()));
+        }
+        let right = unit(self.forward.cross(self.up));
+        self.up = unit(right.cross(self.forward));
+    }
     pub fn new(position: V3, forward: V3) -> Self {
         Self {
             position,
@@ -146,6 +161,10 @@ impl Flight {
                 }
             }
         }
+        if self.paused {
+            self.ship.orient(input, None, dt);
+            self.previous = self.ship;
+        }
         let alpha = (self.accumulator / FIXED_DT).clamp(0., 1.) as f32;
         let position =
             self.previous.position + (self.ship.position - self.previous.position) * alpha;
@@ -189,28 +208,8 @@ impl Flight {
         let near =
             self.region == Region::System && (self.ship.position - center).length() < w.radius * 4.;
         let assist = self.local && near;
-        let reference = if assist { radial } else { self.ship.up };
-        let desired_angular = v(input.pitch, input.yaw, input.roll) * 1.4;
-        self.ship.angular += (desired_angular - self.ship.angular) * (1. - (-STEP * 7.).exp());
+        self.ship.orient(input, assist.then_some(radial), STEP);
         let right = unit(self.ship.forward.cross(self.ship.up));
-        self.ship.forward = unit(rotate(
-            self.ship.forward,
-            reference,
-            -self.ship.angular.y * STEP,
-        ));
-        self.ship.forward = unit(rotate(self.ship.forward, right, self.ship.angular.x * STEP));
-        self.ship.up = unit(rotate(self.ship.up, right, self.ship.angular.x * STEP));
-        self.ship.up = unit(rotate(
-            self.ship.up,
-            self.ship.forward,
-            self.ship.angular.z * STEP,
-        ));
-        if assist {
-            self.ship.up =
-                unit(self.ship.up + (radial - self.ship.up) * (1. - (-STEP * 1.5).exp()));
-        }
-        let right = unit(self.ship.forward.cross(self.ship.up));
-        self.ship.up = unit(right.cross(self.ship.forward));
         let max_speed = if assist {
             4.5
         } else if input.boost {
