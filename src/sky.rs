@@ -145,8 +145,13 @@ impl Skybox {
                         } else {
                             let closest = eye + ray * (-eye.dot(ray)).max(0.);
                             let impact = closest.length() / star_radius;
-                            let halo = (-impact * impact * 0.65).exp() * 0.32;
-                            self.sample(ray) + rgb(0x899cdb) * halo
+                            let halo = if eye.dot(ray) < 0. {
+                                (-impact * impact * 0.38).exp() * 0.75
+                                    + (-impact * impact * 0.06).exp() * 0.045
+                            } else {
+                                0.
+                            };
+                            self.sample(ray) + rgb(0xffd79a) * halo
                         };
                         if phase > 0.001 {
                             let angle = y.atan2(x);

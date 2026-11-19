@@ -16,6 +16,7 @@ pub struct App {
     pub fb: Framebuffer,
     pub sky: Skybox,
     pub materials: Materials,
+    pub glow: crate::glow::SolarGlow,
 }
 impl App {
     pub fn new(scene: Scene) -> Self {
@@ -31,6 +32,7 @@ impl App {
             fb: Framebuffer::new(w, h),
             sky,
             materials,
+            glow: crate::glow::SolarGlow::new(w, h),
         }
     }
     pub fn render(&mut self) -> Metrics {
@@ -66,6 +68,9 @@ impl App {
             self.materials
                 .shade(f, &self.scene, camera.eye, time as f32)
         });
+        if !nucleus {
+            self.glow.apply(&mut self.fb, &self.renderer.fragments);
+        }
         self.renderer.metrics.render_ms = start.elapsed().as_secs_f64() * 1000.;
         self.renderer.metrics
     }

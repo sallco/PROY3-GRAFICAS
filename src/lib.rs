@@ -4,6 +4,7 @@ pub mod demo;
 pub mod flight;
 pub mod framebuffer;
 pub mod geometry;
+pub mod glow;
 pub mod math;
 pub mod obj;
 pub mod renderer;

@@ -81,6 +81,14 @@ fn captures(app: &mut App, output: &Path) -> Result<(), Box<dyn std::error::Erro
             metrics.render_ms, metrics.triangles, metrics.triangles_available
         );
     }
+    app.render_view(
+        Camera::new(v(0., 4., 18.), V3::zero()),
+        None,
+        false,
+        12.,
+        None,
+    );
+    app.fb.export_png(&output.join("sol.png"))?;
     let center = app.scene.center(5, 12.);
     app.render_view(
         Camera::new(center + v(10., -8., 12.), center),

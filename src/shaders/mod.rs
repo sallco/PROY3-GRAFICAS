@@ -102,7 +102,9 @@ impl Materials {
                         0.12,
                         n.sample(q * 15. + v(time * 0.07, 0., 0.)).abs(),
                     );
-                mix(rgb(0x251b67), rgb(0xd0e6ff), cells.powf(0.7)) + rgb(0xe9d4ff) * fil * 0.65
+                (mix(rgb(0xe5a441), rgb(0xfff3cd), cells.powf(0.55)) * 1.05
+                    + rgb(0xfff8db) * fil * 0.5)
+                    * intensity.sqrt()
             }
             1 => {
                 let land = n.fbm(q * 4., 2);
