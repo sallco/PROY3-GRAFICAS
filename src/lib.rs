@@ -1,4 +1,5 @@
 pub mod config;
+pub mod flight;
 pub mod framebuffer;
 pub mod geometry;
 pub mod math;
