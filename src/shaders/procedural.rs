@@ -12,6 +12,11 @@ impl Default for Noise {
     }
 }
 impl Noise {
+    pub fn new(seed: u32) -> Self {
+        Self {
+            generator: OpenSimplex::new(seed),
+        }
+    }
     pub fn sample(&self, p: Vector3) -> f32 {
         self.generator.get([p.x as f64, p.y as f64, p.z as f64]) as f32
     }

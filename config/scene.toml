@@ -1,0 +1,72 @@
+# Parámetros de demostración. R recarga este archivo y restablece el vuelo.
+seed = 42
+width = 768
+height = 432
+star_radius = 5.0
+shader_intensity = 1.0
+
+[[worlds]]
+name = "Mneme"
+kind = "forest"
+radius = 3.4
+orbit = 19.0
+orbit_speed = 0.025
+spin = 0.09
+phase = 0.0
+inclination = 0.03
+instances = 64
+
+[[worlds]]
+name = "Obsidia"
+kind = "volcanic"
+radius = 4.0
+orbit = 36.0
+orbit_speed = 0.018
+spin = 0.075
+phase = 1.1
+inclination = -0.05
+instances = 44
+
+[[worlds]]
+name = "Prisma"
+kind = "ice"
+radius = 4.2
+orbit = 55.0
+orbit_speed = 0.013
+spin = -0.065
+phase = 2.4
+inclination = 0.08
+instances = 56
+
+[[worlds]]
+name = "Artaud"
+kind = "gas"
+radius = 6.0
+orbit = 79.0
+orbit_speed = 0.009
+spin = 0.12
+phase = 3.5
+inclination = -0.04
+instances = 0
+
+[[worlds]]
+name = "Palimpsesto"
+kind = "desert"
+radius = 4.8
+orbit = 103.0
+orbit_speed = 0.007
+spin = 0.055
+phase = 4.5
+inclination = 0.06
+instances = 40
+
+[[worlds]]
+name = "Tierra Plana"
+kind = "flat"
+radius = 6.0
+orbit = 128.0
+orbit_speed = 0.005
+spin = 0.065
+phase = 5.5
+inclination = 0.0
+instances = 0
