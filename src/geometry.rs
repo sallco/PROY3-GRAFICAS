@@ -223,12 +223,21 @@ pub fn ring(segments: usize, inner: f32, outer: f32) -> Mesh {
     m
 }
 pub fn surface_models() -> Vec<Mesh> {
-    let mut tree = crystal(7, 1.3);
-    let mut crown = ring(16, 0.35, 0.8);
-    for p in &mut crown.vertices {
-        p.position.y = 0.9 + 0.16 * (p.position.x * 3.).cos();
+    let mut tree = crystal(7, 1.5);
+    for p in &mut tree.vertices {
+        p.position.x *= 0.4;
+        p.position.z *= 0.4;
     }
-    tree.append(&crown, Transform::new(V3::zero(), 1., 0.));
+    for (height, radius) in [(0.65, 0.8), (0.98, 0.62), (1.27, 0.40)] {
+        let mut crown = ring(32, 0.05, radius);
+        for p in &mut crown.vertices {
+            let angle = p.position.z.atan2(p.position.x);
+            let distance =
+                (p.position.x * p.position.x + p.position.z * p.position.z).sqrt() / radius;
+            p.position.y = height + 0.18 * (1. - distance) + 0.035 * (angle * 5.).sin() * distance;
+        }
+        tree.append(&crown, Transform::new(V3::zero(), 1., 0.));
+    }
     let basalt = crystal(5, 1.1);
     let mut ice = crystal(6, 1.8);
     ice.append(&crystal(5, 1.), Transform::new(v(0.2, 0., 0.1), 0.7, 0.4));
@@ -264,6 +273,21 @@ pub fn surface_models() -> Vec<Mesh> {
         [1, 6, 5],
     ];
     monolith.recalculate_normals();
+    let post = monolith.clone();
+    monolith = Mesh::default();
+    for side in [-1., 1.] {
+        let mut pillar = post.clone();
+        for p in &mut pillar.vertices {
+            p.position.x = p.position.x * 0.65 + side * 0.34;
+        }
+        monolith.append(&pillar, Transform::new(V3::zero(), 1., 0.));
+    }
+    let mut lintel = post;
+    for p in &mut lintel.vertices {
+        p.position.x *= 2.2;
+        p.position.y = 1.3 + p.position.y * 0.085;
+    }
+    monolith.append(&lintel, Transform::new(V3::zero(), 1., 0.));
     vec![tree, basalt, ice, monolith]
 }
 

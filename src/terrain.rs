@@ -113,7 +113,7 @@ pub fn volcanic_vents(p: V3) -> (f32, f32) {
     (cone, crater)
 }
 pub fn salt_basin(p: V3) -> f32 {
-    let d = (p - unit(v(0.7, 0.3, 0.64))).length();
+    let d = (p - unit(v(-0.6, 0.35, 0.7))).length();
     (-d * d / 0.075).exp()
 }
 pub fn world_height(
@@ -137,7 +137,7 @@ pub fn world_height(
                 + 0.025 * (p.y * 17. + noise.sample(p * 3.) * 3.).sin().abs()
         }
         Kind::Desert => {
-            1. + 0.024 * (p.y * 34. + noise.sample(p * 3.) * 4.).sin()
+            1. + 0.024 * (p.dot(v(0.8, 0.3, -0.5)) * 34. + noise.sample(p * 3.) * 4.).sin()
                 + 0.015 * noise.sample(p * 11.)
                 - 0.11 * salt_basin(p)
         }

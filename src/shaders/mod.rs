@@ -1,4 +1,5 @@
 pub mod procedural;
+mod worlds;
 use crate::terrain::land;
 use crate::{math::*, renderer::Fragment, scene::Scene};
 use procedural::{Noise, mix, rgb, smooth};
@@ -10,8 +11,8 @@ pub struct NormalMap {
 }
 impl NormalMap {
     pub fn generate(noise: &Noise) -> Self {
-        let width = 128;
-        let height = 64;
+        let width = 256;
+        let height = 128;
         let height_at = |u: f32, v: f32| {
             let a = u * TAU;
             let lat = (0.5 - v) * PI;
@@ -70,7 +71,7 @@ impl Materials {
         let q = unit(p);
         let n = &scene.noise;
         let mut normal = f.normal;
-        if self.normal_mapping && (1..=5).contains(&f.material) {
+        if self.normal_mapping && (1..=3).contains(&f.material) {
             let u = (q.z.atan2(q.x) / TAU).rem_euclid(1.);
             let vv = 0.5 - q.y.clamp(-1., 1.).asin() / PI;
             let mapped = self.normals.sample(u, vv);
@@ -85,7 +86,14 @@ impl Materials {
                 local_t
             };
             let b = unit(normal.cross(t));
-            normal = unit(t * mapped.x * 0.3 + b * mapped.y * 0.3 + normal * mapped.z.max(0.2));
+            let strength = match f.material {
+                1 => 0.10,
+                2 => 0.35,
+                _ => 0.45,
+            };
+            normal = unit(
+                t * mapped.x * strength + b * mapped.y * strength + normal * mapped.z.max(0.2),
+            );
         }
         let light = unit(-f.world);
         let view = unit(eye - f.world);
@@ -95,82 +103,17 @@ impl Materials {
         let intensity = scene.config.shader_intensity;
         let color = match f.material {
             0 => {
-                let cells = n.evolving(q * 5., time * 0.09, 2);
-                let fil = 1.
-                    - smooth(
-                        0.015,
-                        0.12,
-                        n.sample(q * 15. + v(time * 0.07, 0., 0.)).abs(),
-                    );
-                (mix(rgb(0xe5a441), rgb(0xfff3cd), cells.powf(0.55)) * 1.05
-                    + rgb(0xfff8db) * fil * 0.5)
+                let granules = n.evolving(q * 28., time * 0.09, 2);
+                let hot = smooth(0.36, 0.69, granules);
+                let activity = (n.sample(q * 7. + v(time * 0.035, 0., 0.)) * 0.5 + 0.5).powi(5);
+                (mix(rgb(0xf1b74d), rgb(0xfff8df), hot) * 1.06 + rgb(0xfff1bd) * activity * 0.3)
                     * intensity.sqrt()
             }
-            1 => {
-                let land = n.fbm(q * 4., 2);
-                let threads = 1. - smooth(0.015, 0.065, n.sample(q * 22.).abs());
-                let pulse = 0.6 + 0.4 * (q.y * 14. + time * 0.8).sin();
-                mix(rgb(0x081d28), rgb(0x2a5c51), land) * diffuse
-                    + rgb(0x45f4ce) * threads * pulse * (0.25 + (1. - day) * 0.65) * intensity
-            }
-            2 => {
-                let w = n.warp(q * 4.3, 0.6);
-                let fault = n.sample(w).abs();
-                let lava = 1. - smooth(0.018, 0.085, fault);
-                let flow = 0.5
-                    + 0.5 * (q.dot(v(14., -9., 17.)) - time * 2.5 + n.sample(q * 9.) * 2.).sin();
-                let rock =
-                    mix(rgb(0x151b29), rgb(0x504658), n.sample(q * 29.) * 0.5 + 0.5) * diffuse;
-                mix(
-                    rock,
-                    mix(rgb(0xb62c4c), rgb(0xffd69a), flow) * intensity,
-                    lava,
-                )
-            }
-            3 => {
-                let cracks = 1.
-                    - smooth(
-                        0.008,
-                        0.05,
-                        (n.sample(q * 7.) + 0.12 * (q.y * 45.).sin()).abs(),
-                    );
-                let sheen = normal.dot(half).max(0.).powf(45.) * day;
-                mix(rgb(0x25466a), rgb(0xa7dce8), n.fbm(q * 3., 2)) * diffuse
-                    + rgb(0x8af9f0) * cracks * 0.25
-                    + rgb(0xf0efff) * sheen * 0.8
-            }
-            4 => {
-                let mut a = q.z.atan2(q.x);
-                let lat = q.y;
-                let da = (a - 0.6 + PI).rem_euclid(TAU) - PI;
-                let dy = lat - 0.2;
-                let r2 = da * da + dy * dy * 5.;
-                let vortex = (-r2 * 6.).exp() * 2.5 * (0.7 + 0.3 * (time * 0.5).sin());
-                a += vortex;
-                let pp = v(
-                    a.cos() * (1. - lat * lat).sqrt(),
-                    lat,
-                    a.sin() * (1. - lat * lat).sqrt(),
-                );
-                let bands = 0.5
-                    + 0.5
-                        * (lat * 48.
-                            + n.sample(pp * 7. + v(time * 0.08, 0., time * 0.03)) * 3.
-                            + vortex * 4.)
-                            .sin();
-                let base = mix(rgb(0x34402b), rgb(0xe1ce65), bands);
-                base * (0.3 + 0.7 * day) + rgb(0xdba660) * (-r2 * 14.).exp() * 0.35
-            }
-            5 => {
-                let dune = 0.5 + 0.5 * (q.y * 75. + n.sample(q * 4.) * 8.).sin();
-                let interference = (q.dot(v(22., 4., 11.)) + time * 0.12).sin().abs().powi(18);
-                mix(
-                    rgb(0x67475e),
-                    rgb(0xdeb08d),
-                    dune * 0.55 + n.fbm(q * 5., 2) * 0.45,
-                ) * diffuse
-                    + rgb(0xa99aec) * interference * 0.08
-            }
+            1 => worlds::forest(q, n, time, day, intensity),
+            2 => worlds::volcanic(q, n, time, day, intensity),
+            3 => worlds::ice(q, n, normal, light, view),
+            4 => worlds::gas(q, n, time, day),
+            5 => worlds::desert(q, n, time, day),
             6 => earth(p, normal, light, view, time, n),
             7 => {
                 let panel = (p.x * 30.).sin().abs().min((p.z * 24.).sin().abs());
@@ -185,13 +128,26 @@ impl Materials {
                 let stripes = 0.5 + 0.5 * (r * 185.).sin();
                 mix(rgb(0x64517f), rgb(0xd5bd91), stripes) * (0.4 + 0.6 * day)
             }
-            9 => rgb(0x123b42) * diffuse + rgb(0x54d9bd) * (0.35 + 0.2 * (p.y * 8. - time).sin()),
-            10 => mix(rgb(0x282338), rgb(0xe07668), smooth(0.65, 1.1, p.y)) * diffuse,
-            11 => {
-                rgb(0x9bdce5) * (0.3 + 0.7 * day)
-                    + rgb(0xd1d1ff) * normal.dot(half).max(0.).powf(18.) * 0.4
+            9 => {
+                let radius = (p.x * p.x + p.z * p.z).sqrt();
+                if p.y < 0.45 {
+                    rgb(0x5f4935) * diffuse
+                } else {
+                    let edge = (radius * 30.).sin().abs();
+                    mix(rgb(0x34662e), rgb(0xc1d67a), edge * 0.7) * (0.4 + 0.6 * day)
+                        + rgb(0xa8e8ab) * edge.powi(14) * (0.15 + 0.06 * (p.y * 8. - time).sin())
+                }
             }
-            _ => rgb(0x88718d) * diffuse + rgb(0xc8b5ff) * (p.y * 24.).sin().abs().powi(24) * 0.15,
+            10 => mix(rgb(0x302823), rgb(0xcb5724), smooth(0.8, 1.1, p.y)) * diffuse,
+            11 => {
+                let facets = normal.dot(half).max(0.).powf(25.);
+                mix(rgb(0x829bbb), rgb(0xc6eaf2), p.y.clamp(0., 1.)) * (0.4 + 0.6 * day)
+                    + rgb(0xd5bdf5) * facets * 0.55
+            }
+            _ => {
+                let glyph = (p.y * 28.).sin().abs().powi(24) * smooth(0.05, 0.15, p.y);
+                rgb(0x3b2f37) * (0.4 + 0.6 * day) + rgb(0xf5c878) * glyph * 0.55
+            }
         };
         v(color.x.max(0.), color.y.max(0.), color.z.max(0.))
     }

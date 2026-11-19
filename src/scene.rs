@@ -73,7 +73,13 @@ impl Scene {
             flat: vec![disk(32, 8), disk(64, 16), disk(128, 32)],
             models: surface_models(),
             ship,
-            rings: ring(128, 1.27, 1.85),
+            rings: {
+                let mut rings = Mesh::default();
+                for (inner, outer) in [(1.27, 1.43), (1.49, 1.63), (1.71, 1.85)] {
+                    rings.append(&ring(256, inner, outer), Transform::new(V3::zero(), 1., 0.));
+                }
+                rings
+            },
             instances,
             noise,
             lod: true,
