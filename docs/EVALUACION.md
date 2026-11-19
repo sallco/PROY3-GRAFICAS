@@ -50,7 +50,7 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 
 ## Guion de demostración interactiva
 
-1. Iniciar en release; mostrar la nave y la ayuda. Avanzar con `W`, frenar con `X` y orientar con las flechas.
+1. Iniciar en release, seleccionar **Explorar sistema** y mostrar la nave y la ayuda. Avanzar con `W`, frenar con `X` y orientar con las flechas.
 2. Acercarse a Tahiti, activar `F` y usar `A/D` para rodearlo. Mostrar árboles anulares y emisión superficial. Alejarse con `S`.
 3. Seleccionar mundos con `Tab`, orientar hacia el marcador y utilizar el impulso para viajar. Examinar lava, hielo, tormenta, dunas y pórticos.
 4. En Tierra Plana, recorrer el borde y observar la base. Mostrar la protección de tapas y pared.
@@ -74,3 +74,7 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 | 01:33–01:36 | Cierre del recorrido. |
 
 El video es una captura reproducible del renderer con pilotaje programado y un montaje identificado de vistas. No sustituye la demostración de controles ni las comparaciones técnicas en la aplicación.
+
+## Inspección adicional mediante el museo
+
+Desde el menú principal o con `M` en vuelo, abrir el catálogo y seleccionar cualquiera de sus ocho figuras. Inspeccionar superficies y modelos con zoom, órbita y desplazamiento; pausar la animación y volver a activarla. En la nave, `V` compara los 116 480 triángulos originales con los 3261 de vuelo. Regresar con `Esc` conserva el estado de la exploración. El museo facilita explicar los materiales y la geometría; no se contabiliza como una categoría adicional del menú de puntos.

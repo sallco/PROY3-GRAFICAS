@@ -43,6 +43,8 @@ Ambas imágenes utilizan la misma cámara, transformación y normalización. La 
 
 Las versiones resueltas y licencias declaradas por las dependencias se encuentran en Cargo.lock y sus paquetes. El repositorio no cambia sus condiciones de distribución.
 
+El museo reutiliza estos mismos recursos y no incorpora modelos artísticos adicionales. Carga la nave original y la optimizada al iniciar para permitir su comparación inmediata.
+
 ## Procedimientos reproducibles
 
 ```bash

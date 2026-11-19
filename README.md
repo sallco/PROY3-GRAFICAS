@@ -54,9 +54,11 @@ cargo run --release --locked
 
 Se recomienda la compilación **release**. La ventana mide 1280 × 720; el framebuffer se calcula a 768 × 432 y se escala para su presentación. Los recursos y la configuración predeterminada se resuelven desde el directorio del proyecto incorporado durante la compilación.
 
+Al iniciar se muestra el menú principal: `Enter` abre la exploración y `M` entra al museo de modelos. También se puede elegir con el ratón.
+
 El ratón se captura con `C`; las flechas permiten orientar la nave desde el inicio. El botón de viaje funciona con el cursor libre.
 
-## Controles
+## Controles de vuelo
 
 | Entrada | Acción |
 | --- | --- |
@@ -74,7 +76,8 @@ El ratón se captura con `C`; las flechas permiten orientar la nave desde el ini
 | `P` | Pausar la simulación; la orientación permanece disponible. |
 | `H` | Mostrar u ocultar ayuda. |
 | `R` | Recargar configuración y restablecer el vuelo. |
-| `Esc` | Salir. |
+| `M` | Abrir el museo conservando el estado del vuelo. |
+| `Esc` | Volver al menú principal; desde el menú, salir. |
 
 Para rodear un planeta, activar `F`, orientar la nave hacia su superficie y utilizar `A`/`D` para recorrerla lateralmente. `Espacio`/`Ctrl` regulan la componente radial de movimiento. La asistencia ajusta velocidad y referencia de control; no pilota automáticamente.
 
@@ -92,6 +95,34 @@ El indicador de distancia radial usa la distancia al centro menos el radio nomin
 | `F6` | Activar/desactivar mapeo de normales. |
 
 Las métricas permiten demostrar que las optimizaciones modifican el trabajo del rasterizador. Los anillos y copas anulares son geometría decorativa y no tienen colisión; los cuerpos y modelos de superficie sí emplean volúmenes conservadores.
+
+## Museo de modelos
+
+El museo es una vista separada de la exploración, accesible desde el menú principal o mediante `M` durante el vuelo. Su catálogo contiene **ocho figuras**: el sol, Tahiti, Obsidia, Prisma, Artaud, Palimpsesto, Tierra Plana y la nave.
+
+![Museo: inspección de Prisma](docs/imagenes/museo.png)
+
+Cada figura se renderiza en CPU sobre un fondo de estudio con el máximo detalle geométrico disponible. Los planetas conservan sus modelos de superficie y anillos. La rotación axial, las nubes, la lava, las tormentas, la granulación solar y la emisión siguen usando los mismos materiales y algoritmos del mundo libre; el sol conserva su resplandor. La cámara acompaña el centro del cuerpo para mantener la figura encuadrada.
+
+El museo tiene un reloj independiente. La exploración queda suspendida mientras se visita el museo o el menú: al regresar se conservan posición, velocidad, orientación, cámara, destino y pausa del vuelo. Pausar una figura permite seguir inspeccionándola con la cámara.
+
+| Entrada del museo | Acción |
+| --- | --- |
+| Clic en el catálogo / `1`–`8` | Seleccionar una figura. |
+| `Tab` / `Shift` + `Tab` | Seleccionar la figura siguiente o anterior. |
+| Arrastrar con el botón izquierdo / flechas | Orbitar alrededor de la figura. |
+| Rueda / `+` / `-` | Acercar o alejar mediante zoom. |
+| Arrastrar con el botón derecho / `Shift` + flechas | Desplazar el encuadre para inspeccionar un detalle. |
+| `Espacio` | Activar o desactivar el giro automático de la vista. |
+| `P` | Pausar o reanudar las animaciones y el giro automático. |
+| `R` | Restablecer el encuadre, sin reiniciar el tiempo de animación. |
+| `V`, al observar la nave | Comparar el modelo original con la malla de vuelo. |
+| `F3` | Mostrar tiempo de CPU, cantidad de triángulos y zoom. |
+| `Esc` / `M` | Regresar a la pantalla desde la que se abrió el museo. |
+
+La nave se muestra inicialmente con sus **116 480 triángulos originales**. La comparación utiliza los mismos controles y encuadre para alternar con la malla de vuelo de 3261 triángulos. No se cargan modelos al cambiar de figura: ambas mallas y los demás recursos se preparan al iniciar.
+
+[Menú principal](docs/imagenes/menu.png) · [Sol en el museo](docs/imagenes/museo-sol.png) · [Nave original](docs/imagenes/museo-nave.png)
 
 ## Configuración y demostración técnica
 
@@ -132,7 +163,7 @@ cargo clippy --locked --all-targets -- -D warnings
 cargo build --release --locked
 ```
 
-Las **31 pruebas automatizadas** cubren clipping, profundidad entre objetos, recursos, generación de geometría, semillas, orientación de instancias, equivalencia temporal, gravedad, colisiones, pausa, viaje de ida y vuelta y equivalencia de imagen con/sin descarte.
+Las **36 pruebas automatizadas** cubren clipping, profundidad entre objetos, recursos, generación de geometría, semillas, orientación de instancias, equivalencia temporal, gravedad, colisiones, pausa, viaje de ida y vuelta y equivalencia de imagen con/sin descarte. Las pruebas del museo verifican aislamiento de las ocho figuras, máximo detalle, pausa, límites de cámara, comparación de mallas y conservación del vuelo.
 
 La nave de vuelo conserva el modelo original y reduce sus **116 480 triángulos a 3261**. La generación puede repetirse con Blender:
 

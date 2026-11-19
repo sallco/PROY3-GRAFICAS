@@ -42,7 +42,8 @@ Presentación escalada e interfaz 2D
 | `shaders` / `terrain` | Materiales, mapa normal y geografía del disco. |
 | `sky` / `glow` | Skybox cúbico, halo, bloom solar, warping y aproximación visual de Umbra. |
 | `flat_collision` | Barrido contra la base cónica, el borde y la tapa del disco. |
-| `app` / `main` | Composición del cuadro, ventana, interfaz, configuración y modos de ejecución. |
+| `app` / `main` | Composición del cuadro, configuración y modos de ejecución. |
+| `museum` / `ui` | Cámara y reloj del museo, menú principal, catálogo, controles y HUD. |
 | `demo` | Recorrido reproducible y transmisión de cuadros a FFmpeg. |
 
 No se invocan funciones de dibujo 3D, carga automática de modelos, shaders GPU, cámaras 3D ni física de Raylib. Sus tipos vectoriales se utilizan como estructuras matemáticas.
@@ -98,6 +99,18 @@ Los límites no pretenden reproducir contacto exacto con cada triángulo. No se 
 ### Viaje
 
 El salto dura tres segundos y cambia de región en su punto medio. Conserva el estado de la nave al salir del sistema, prepara una posición segura en Umbra y rechaza nuevas solicitudes durante la transición. Al regresar restaura posición y orientación, detiene la velocidad y resuelve posibles intersecciones con cuerpos que hayan seguido moviéndose.
+
+## Museo y navegación entre pantallas
+
+La interfaz distingue tres pantallas: menú principal, vuelo y museo. Solo la pantalla de vuelo procesa entrada de navegación y avanza `Flight`. El museo almacena selección, orientación de cámara, desplazamiento, zoom, pausa y giro automático en un estado independiente. Al entrar libera el cursor; al volver restaura su modo de captura, si estaba activo.
+
+`Scene::add_body_calls` reúne geometría, anillos e instancias de un cuerpo y se comparte entre vuelo y museo. `Scene::exhibit_calls` selecciona únicamente la figura solicitada, con el nivel esférico máximo o el disco más detallado. No modifica la selección de LOD del vuelo. La nave original y la optimizada se cargan y normalizan al preparar la escena; el museo usa la original por defecto.
+
+`App::render_exhibit` utiliza el mismo rasterizador, profundidad, shaders y máscara de resplandor solar sobre un fondo de estudio calculado en CPU. La cámara sigue el centro orbital del cuerpo, por lo que la figura permanece centrada mientras su rotación y materiales evolucionan. El reloj se inicia en un instante de presentación de 12 s y avanza mientras el museo está activo, independientemente del tiempo guardado del sistema.
+
+El zoom modifica el campo de visión entre límites acotados; la cámara permanece fuera de la figura. El desplazamiento de encuadre utiliza sus ejes derecho y superior. Esta separación permite inspeccionar detalles con zoom sin atravesar la superficie ni perder la orientación. Restablecer la vista no retrocede las animaciones. La pausa detiene el reloj y la órbita automática, pero permite manipular la cámara.
+
+Las pruebas del museo renderizan las ocho figuras y comprueban que los fragmentos pertenecen exclusivamente al objeto elegido, que se utiliza máximo detalle, que las dos mallas de nave conservan el encuadre y que el vuelo y su LOD permanecen idénticos tras la inspección. La revisión nativa también compara la imagen solar pausada y en movimiento y recorre el catálogo con entradas de ratón.
 
 ## Rendimiento
 
