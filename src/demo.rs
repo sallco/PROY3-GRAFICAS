@@ -54,7 +54,7 @@ pub fn record(app: &mut App, output: &Path) -> Result<(), Box<dyn std::error::Er
     }
     let chapters = [
         (0, 12, "01 / VUELO Y APROXIMACION"),
-        (12, 38, "02 / VUELTA COMPLETA A MNEME"),
+        (12, 38, "02 / VUELTA COMPLETA A TAHITI"),
         (38, 46, "03 / ALEJAMIENTO CONTINUO"),
         (46, 52, "04 / OBSIDIA - CORTEZA Y LAVA"),
         (52, 58, "05 / PRISMA - HIELO Y CRISTALES"),

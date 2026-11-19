@@ -4,7 +4,7 @@
 
 Seis mundos en movimiento, una nave de exploración y una ruta hacia el núcleo galáctico. **Nadir** construye cada imagen mediante un rasterizador escrito en Rust que se ejecuta en CPU: desde las transformaciones y el recorte de triángulos hasta la profundidad, la iluminación y los materiales procedurales.
 
-![Vuelo alrededor de Mneme](docs/imagenes/vuelo.png)
+![Vuelo alrededor de Tahiti](docs/imagenes/vuelo.png)
 
 **Autor:** sallco · **Modalidad:** individual · **Curso:** Gráficas por Computadora, Universidad del Valle de Guatemala.
 
@@ -12,26 +12,26 @@ Seis mundos en movimiento, una nave de exploración y una ruta hacia el núcleo 
 
 ## La experiencia
 
-La exploración comienza frente a Mneme. La nave puede aproximarse, rodear el planeta y alejarse sin cambiar de escena. La asistencia local facilita maniobrar cerca de las superficies; el impulso de crucero permite recorrer el sistema. Las órbitas, la rotación, la gravedad y los materiales continúan evolucionando durante el vuelo.
+La exploración comienza frente a Tahiti. La nave puede aproximarse, rodear el planeta y alejarse sin cambiar de escena. La asistencia local facilita maniobrar cerca de las superficies; el impulso de crucero permite recorrer el sistema. Las órbitas, la rotación, la gravedad y los materiales continúan evolucionando durante el vuelo.
 
 | Mundo | Identidad |
 | --- | --- |
-| **Mneme** | Bosque de copas anulares escalonadas, colinas verdes y lagunas violetas con bioluminiscencia tenue. |
+| **Tahiti** | Bosque de copas anulares escalonadas, colinas verdes y lagunas violetas con bioluminiscencia tenue. |
 | **Obsidia** | Macizo volcánico fracturado: crestas irregulares, conos con calderas, agujas de basalto y lava naranja animada. |
 | **Prisma** | Glaciares blancos, grietas azul profundo y grandes agujas cristalinas con reflejos violetas. |
 | **Artaud** | Atmósfera de bandas ámbar y malva, tormenta oscura en espiral y tres anillos separados. |
 | **Palimpsesto** | Desierto de cobre: campos de dunas, roca expuesta, una cuenca salina y pórticos de observatorio. |
 | **Tierra Plana** | Disco de océanos y continentes, relieve continental, nubes, borde helado y una base rocosa cónica y puntiaguda. |
 
-| Mneme | Obsidia |
+| Tahiti | Obsidia |
 | --- | --- |
-| ![Mneme](docs/imagenes/mneme.png) | ![Obsidia](docs/imagenes/obsidia.png) |
+| ![Tahiti](docs/imagenes/tahiti.png) | ![Obsidia](docs/imagenes/obsidia.png) |
 | **Prisma** | **Artaud** |
 | ![Prisma](docs/imagenes/prisma.png) | ![Artaud](docs/imagenes/artaud.png) |
 | **Palimpsesto** | **Tierra Plana** |
 | ![Palimpsesto](docs/imagenes/palimpsesto.png) | ![Tierra Plana](docs/imagenes/tierra-plana.png) |
 
-**Mneme** es el nombre del planeta-bosque. Su concepto es un archivo vivo: las copas anulares evocan capas de crecimiento y las lagunas violetas separan las regiones de vegetación. La identidad de cada mundo se apoya en relieve, escala de objetos y respuesta del material, además de su paleta.
+**Tahiti** es el planeta-bosque: un ecosistema de colinas verdes, lagunas violetas y árboles de copas anulares escalonadas. La identidad de cada mundo se apoya en relieve, escala de objetos y respuesta del material, además de su paleta.
 
 El sol utiliza granulación blanca y dorada, halo cálido y resplandor calculado en CPU. [Ver el sol](docs/imagenes/sol.png). La base de Tierra Plana puede observarse [desde abajo](docs/imagenes/tierra-plana-inferior.png).
 
@@ -121,7 +121,7 @@ cargo run --release --locked -- --export-models --output output/modelos
 cargo run --release --locked -- --record-demo --output output/nadir.mp4
 ```
 
-El [video incluido](docs/video/nadir.mp4) se genera con el mismo renderer. Sus primeros 46 segundos utilizan entradas calculadas para el controlador de vuelo: aproximación, vuelta completa a Mneme y alejamiento continuo. Continúa con un montaje de los otros mundos y el viaje de ida y vuelta a Umbra. Los rótulos y la codificación del video se aplican con FFmpeg. Este recorrido reproducible complementa la ejecución interactiva.
+El [video incluido](docs/video/nadir.mp4) se genera con el mismo renderer. Sus primeros 46 segundos utilizan entradas calculadas para el controlador de vuelo: aproximación, vuelta completa a Tahiti y alejamiento continuo. Continúa con un montaje de los otros mundos y el viaje de ida y vuelta a Umbra. Los rótulos y la codificación del video se aplican con FFmpeg. Este recorrido reproducible complementa la ejecución interactiva.
 
 ## Verificación
 

@@ -68,7 +68,7 @@ fn captures(app: &mut App, output: &Path) -> Result<(), Box<dyn std::error::Erro
         let camera = app.showcase(i, 12.);
         let metrics = app.render_view(camera, None, false, 12., None);
         let name = [
-            "mneme",
+            "tahiti",
             "obsidia",
             "prisma",
             "artaud",

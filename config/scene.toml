@@ -6,7 +6,7 @@ star_radius = 5.0
 shader_intensity = 1.0
 
 [[worlds]]
-name = "Mneme"
+name = "Tahiti"
 kind = "forest"
 radius = 3.4
 orbit = 19.0

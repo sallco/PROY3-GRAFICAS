@@ -16,12 +16,12 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 
 | Categoría / característica | Puntos solicitados | Dónde observarla y cómo explicarla |
 | --- | ---: | --- |
-| Cinco planetas distinguibles | 50 | Mneme, Obsidia, Prisma, Artaud y Palimpsesto: geometría/material, órbita, rotación y acercamiento. Tierra Plana amplía el contenido sin incrementar este máximo. |
+| Cinco planetas distinguibles | 50 | Tahiti, Obsidia, Prisma, Artaud y Palimpsesto: geometría/material, órbita, rotación y acercamiento. Tierra Plana amplía el contenido sin incrementar este máximo. |
 | Cuatro tipos de modelos propios sobre superficies | 20 | Árboles anulares, agujas de basalto, cristales y pórticos de observatorio. `geometry::surface_models`; OBJ de referencia en `assets/models/superficie`. |
 | Distribución procedural reproducible mediante ruido | 10 | Candidatos esféricos filtrados por OpenSimplex; cambiar `seed`, recargar y restaurar la misma semilla. `scene::generate_instances`. |
 | Posición y orientación sobre superficie curva en rotación | 5 | Las instancias se transforman desde el espacio local del planeta; las normales de Obsidia incluyen su deformación. Prueba `instances_follow_curvature_and_rotation`. |
 | Cuatro shaders propios diferentes | 24 | Plasma estelar, redes bioluminiscentes, fracturas de lava y bandas con vórtice. No se cuentan variaciones de color como shaders diferentes. |
-| Shader animado | 8 | Evolución del plasma, emisión de Mneme, frentes térmicos y corrientes de Artaud. El tiempo simulado alimenta los materiales. |
+| Shader animado | 8 | Evolución del plasma, emisión de Tahiti, frentes térmicos y corrientes de Artaud. El tiempo simulado alimenta los materiales. |
 | Mapeo de normales | 8 | Mapa procedural, UV esféricas, muestreo bilineal y base tangente; comparar con `F6`, especialmente en Prisma. |
 | Deformación geométrica planetaria | 10 | El radio de vértices de Obsidia cambia mediante ruido; inspeccionar la silueta y `terrain::world_height`. |
 | Generación/subdivisión propia de geometría | 10 | Subdivisión con caché de aristas y proyección esférica; Tierra Plana se construye con anillos, tapa, pared y base cónica. |
@@ -51,7 +51,7 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 ## Guion de demostración interactiva
 
 1. Iniciar en release; mostrar la nave y la ayuda. Avanzar con `W`, frenar con `X` y orientar con las flechas.
-2. Acercarse a Mneme, activar `F` y usar `A/D` para rodearlo. Mostrar árboles anulares y emisión superficial. Alejarse con `S`.
+2. Acercarse a Tahiti, activar `F` y usar `A/D` para rodearlo. Mostrar árboles anulares y emisión superficial. Alejarse con `S`.
 3. Seleccionar mundos con `Tab`, orientar hacia el marcador y utilizar el impulso para viajar. Examinar lava, hielo, tormenta, dunas y pórticos.
 4. En Tierra Plana, recorrer el borde y observar la base. Mostrar la protección de tapas y pared.
 5. Activar `F3`; comparar `F4/F5` desde un mismo encuadre. Comparar normales con `F6`.
@@ -65,7 +65,7 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 | Intervalo | Contenido |
 | --- | --- |
 | 00:00–00:12 | Vuelo y aproximación mediante entradas al controlador. |
-| 00:12–00:38 | Vuelta completa a Mneme, sin corte de escena. |
+| 00:12–00:38 | Vuelta completa a Tahiti, sin corte de escena. |
 | 00:38–00:46 | Alejamiento continuo. |
 | 00:46–01:16 | Montaje de los otros cinco mundos; Tierra Plana muestra superficie, borde y punta inferior. |
 | 01:16–01:19 | Warping hacia el núcleo. |
