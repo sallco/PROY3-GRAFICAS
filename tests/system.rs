@@ -447,3 +447,17 @@ fn pointed_underside_is_protected_by_conical_collision() {
     );
     assert!(normal.is_some());
 }
+
+#[test]
+fn procedural_groves_cover_both_hemispheres_and_avoid_lakes() {
+    let n = Noise::new(42);
+    let instances = generate_instances(&n, Kind::Forest, 64);
+    assert_eq!(instances.len(), 64);
+    assert!(instances.iter().any(|p| p.transform.position.y < -0.5));
+    assert!(instances.iter().any(|p| p.transform.position.y > 0.5));
+    assert!(
+        instances
+            .iter()
+            .all(|p| n.fbm(unit(p.transform.position) * 2.8, 3) >= 0.509)
+    );
+}

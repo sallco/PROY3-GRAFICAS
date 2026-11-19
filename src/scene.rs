@@ -210,13 +210,27 @@ pub fn generate_instances(noise: &Noise, kind: Kind, count: usize) -> Vec<Instan
         _ => return Vec::new(),
     };
     let mut out = Vec::new();
-    let candidates = count * 5;
-    for i in 0..candidates {
-        let y = 1. - 2. * (i as f32 + 0.5) / candidates as f32;
-        let a = i as f32 * 2.399963;
-        let r = (1. - y * y).sqrt();
-        let dir = v(a.cos() * r, y, a.sin() * r);
-        if noise.sample(dir * 3.7) < -0.15 {
+    let candidate_count = count * 5;
+    let mut candidates: Vec<_> = (0..candidate_count)
+        .map(|i| {
+            let y = 1. - 2. * (i as f32 + 0.5) / candidate_count as f32;
+            let a = i as f32 * 2.399963;
+            let r = (1. - y * y).sqrt();
+            let direction = v(a.cos() * r, y, a.sin() * r);
+            (direction, noise.sample(direction * 53.))
+        })
+        .collect();
+    // Seleccionar por ruido antes de truncar evita concentrar instancias en el norte.
+    candidates.sort_by(|a, b| a.1.total_cmp(&b.1));
+    for (dir, _) in candidates {
+        let suitable = match kind {
+            Kind::Forest => noise.fbm(dir * 2.8, 3) >= 0.51,
+            Kind::Desert => {
+                crate::terrain::salt_basin(dir) < 0.65 && noise.sample(dir * 3.7) >= -0.15
+            }
+            _ => noise.sample(dir * 3.7) >= -0.15,
+        };
+        if !suitable {
             continue;
         }
         let radius = crate::terrain::world_height(noise, kind, dir);
