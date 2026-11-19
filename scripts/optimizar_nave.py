@@ -20,6 +20,10 @@ for obj in objects:
     offset = len(vertices)
     vertices.extend(obj.matrix_world @ vertex.co for vertex in obj.data.vertices)
     faces.extend(tuple(offset + i + 1 for i in face.vertices) for face in obj.data.polygons)
+used = sorted({index for face in faces for index in face})
+remap = {old: new + 1 for new, old in enumerate(used)}
+vertices = [vertices[index - 1] for index in used]
+faces = [tuple(remap[index] for index in face) for face in faces]
 with (root / "assets/models/nave-vuelo.obj").open("w") as output:
     output.write("# Nadir | nave de vuelo optimizada a partir del modelo original de sallco\n")
     for vertex in vertices:
