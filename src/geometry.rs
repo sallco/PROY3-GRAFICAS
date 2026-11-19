@@ -21,7 +21,9 @@ impl Mesh {
                 .collect(),
             triangles: obj
                 .indices
-                .chunks_exact(3)
+                .as_chunks::<3>()
+                .0
+                .iter()
                 .map(|x| [x[0], x[1], x[2]])
                 .collect(),
         }

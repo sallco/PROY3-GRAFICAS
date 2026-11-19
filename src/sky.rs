@@ -132,7 +132,7 @@ impl Skybox {
             for (part, pixels) in fb.pixels.chunks_mut(chunk).enumerate() {
                 s.spawn(move || {
                     let start = part * chunk / 4;
-                    for (offset, pixel) in pixels.chunks_exact_mut(4).enumerate() {
+                    for (offset, pixel) in pixels.as_chunks_mut::<4>().0.iter_mut().enumerate() {
                         let i = start + offset;
                         let x = (2. * (i % w) as f32 / w as f32 - 1.) * aspect;
                         let y = 1. - 2. * (i / w) as f32 / h as f32;

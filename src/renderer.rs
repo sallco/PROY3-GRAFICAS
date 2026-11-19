@@ -237,7 +237,7 @@ impl Renderer {
             {
                 let shader = &shader;
                 s.spawn(move || {
-                    for (pixel, fragment) in pixels.chunks_exact_mut(4).zip(frags) {
+                    for (pixel, fragment) in pixels.as_chunks_mut::<4>().0.iter_mut().zip(frags) {
                         if let Some(f) = fragment {
                             pixel.copy_from_slice(&rgba(shader(f)));
                         }

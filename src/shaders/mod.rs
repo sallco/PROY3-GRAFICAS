@@ -172,7 +172,7 @@ impl Materials {
             7 => {
                 let panel = (p.x * 30.).sin().abs().min((p.z * 24.).sin().abs());
                 let metal = mix(rgb(0x718394), rgb(0xc4d5dc), smooth(0.04, 0.1, panel));
-                let trim = (p.x.abs() > 0.3 && p.y > 0.).then_some(0.5).unwrap_or(0.);
+                let trim = if p.x.abs() > 0.3 && p.y > 0. { 0.5 } else { 0. };
                 metal * (0.27 + day * 0.73)
                     + rgb(0x61f4e2) * trim
                     + rgb(0xd8e8ff) * normal.dot(half).max(0.).powf(30.) * day * 0.7
