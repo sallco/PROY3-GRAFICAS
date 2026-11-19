@@ -133,7 +133,7 @@ pub fn disk(segments: usize, rings: usize) -> Mesh {
                 let h = if side == 0 {
                     crate::terrain::flat_height(v(r * a.cos(), 0., r * a.sin()))
                 } else {
-                    -0.17 - 0.18 * (1. - r * r) + 0.018 * (a * 13.).sin() * r
+                    -0.70 + 0.54 * r + 0.025 * (a * 7. + r * 21.).sin() * r * (1. - r)
                 };
                 m.vertices.push(Vertex {
                     position: v(r * a.cos(), h, r * a.sin()),

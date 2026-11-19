@@ -1,6 +1,7 @@
 pub mod app;
 pub mod config;
 pub mod demo;
+pub mod flat_collision;
 pub mod flight;
 pub mod framebuffer;
 pub mod geometry;

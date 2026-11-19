@@ -420,3 +420,30 @@ fn detailed_terrain_stays_inside_navigation_bounds() {
         .fold(f32::NEG_INFINITY, f32::max);
     assert!(hi - lo > 0.22, "relieve insuficiente: {lo}..{hi}");
 }
+
+#[test]
+fn pointed_underside_is_protected_by_conical_collision() {
+    let s = scene();
+    let mesh = &s.flat[2];
+    let bottom = mesh
+        .vertices
+        .iter()
+        .map(|p| p.position.y)
+        .fold(f32::INFINITY, f32::min);
+    assert!(bottom < -0.69);
+    for p in &mesh.vertices {
+        let r = (p.position.x * p.position.x + p.position.z * p.position.z).sqrt();
+        assert!(p.position.y >= -0.73 + 0.54 * r - 1e-5);
+    }
+    let center = s.center(5, 0.);
+    let (_, normal) = resolve_scene(
+        s,
+        Region::System,
+        0.,
+        0.,
+        center + v(0., -15., 0.),
+        center + v(0., 0., 0.),
+        SHIP_RADIUS,
+    );
+    assert!(normal.is_some());
+}

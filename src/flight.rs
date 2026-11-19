@@ -309,54 +309,6 @@ pub fn sphere_contact(from: V3, to: V3, radius: f32) -> Option<(f32, V3)> {
         None
     }
 }
-/// Cilindro cerrado expandido: tapas, pared y expulsión por la salida más próxima.
-pub fn cylinder_contact(from: V3, to: V3, r: f32, bottom: f32, top: f32) -> Option<(f32, V3)> {
-    let radial = (from.x * from.x + from.z * from.z).sqrt();
-    if radial < r && from.y > bottom && from.y < top {
-        let side = r - radial;
-        let up = top - from.y;
-        let down = from.y - bottom;
-        return Some((
-            0.,
-            if up < side && up < down {
-                v(0., 1., 0.)
-            } else if down < side {
-                v(0., -1., 0.)
-            } else {
-                unit(v(from.x, 0., from.z))
-            },
-        ));
-    }
-    let d = to - from;
-    let mut best: Option<(f32, V3)> = None;
-    let mut add = |t: f32, n: V3| {
-        if (0.0..=1.).contains(&t) && best.is_none_or(|b| t < b.0) {
-            best = Some((t, n));
-        }
-    };
-    if d.y.abs() > 1e-8 {
-        for (h, n) in [(bottom, v(0., -1., 0.)), (top, v(0., 1., 0.))] {
-            let t = (h - from.y) / d.y;
-            let p = from + d * t;
-            if p.x * p.x + p.z * p.z <= r * r {
-                add(t, n);
-            }
-        }
-    }
-    let a = d.x * d.x + d.z * d.z;
-    let b = from.x * d.x + from.z * d.z;
-    let c = from.x * from.x + from.z * from.z - r * r;
-    let disc = b * b - a * c;
-    if a > 1e-10 && disc >= 0. {
-        for t in [(-b - disc.sqrt()) / a, (-b + disc.sqrt()) / a] {
-            let p = from + d * t;
-            if p.y >= bottom && p.y <= top {
-                add(t, unit(v(p.x, 0., p.z)));
-            }
-        }
-    }
-    best
-}
 pub fn resolve_scene(
     scene: &Scene,
     region: Region,
@@ -386,22 +338,11 @@ pub fn resolve_scene(
             let old = scene.center(i, old_time);
             let now = scene.center(i, time);
             if w.kind == Kind::Flat {
-                let r = w.radius + padding;
-                let bottom = -0.38 * w.radius - padding;
-                let top = 0.14 * w.radius + padding;
-                let f = from - old;
-                let t = position - now;
-                if let Some((hit, n)) = cylinder_contact(f, t, r, bottom, top) {
-                    let q = f + (t - f) * hit;
-                    let boundary = if n.y > 0.5 {
-                        v(q.x, top + 0.002, q.z)
-                    } else if n.y < -0.5 {
-                        v(q.x, bottom - 0.002, q.z)
-                    } else {
-                        n * (r + 0.002) + v(0., q.y, 0.)
-                    };
-                    position = now + boundary;
-                    contact = Some(n);
+                if let Some((point, normal)) =
+                    crate::flat_collision::contact(from - old, position - now, w.radius, padding)
+                {
+                    position = now + point;
+                    contact = Some(normal);
                 }
             } else {
                 let radius = w.radius * crate::terrain::surface_bound(w.kind);
@@ -445,22 +386,5 @@ mod tests {
         let hit = sphere_contact(v(-20., 0., 0.), v(20., 0., 0.), 2.).unwrap();
         assert!((hit.0 - 0.45).abs() < 1e-5);
         assert_eq!(hit.1, v(-1., 0., 0.));
-    }
-    #[test]
-    fn cylinder_handles_caps_sides_and_inside() {
-        assert_eq!(
-            cylinder_contact(v(0., 10., 0.), v(0., -10., 0.), 2., -1., 1.)
-                .unwrap()
-                .1,
-            v(0., 1., 0.)
-        );
-        assert_eq!(
-            cylinder_contact(v(10., 0., 0.), v(-10., 0., 0.), 2., -1., 1.)
-                .unwrap()
-                .1,
-            v(1., 0., 0.)
-        );
-        assert!(cylinder_contact(v(0., 0., 0.), v(0., 0., 0.), 2., -1., 1.).is_some());
-        assert!(cylinder_contact(v(3., 2., 0.), v(3., -2., 0.), 2., -1., 1.).is_none());
     }
 }
