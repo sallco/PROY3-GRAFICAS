@@ -170,7 +170,7 @@ pub fn disk(segments: usize, rings: usize) -> Mesh {
         let b = rings * segments + (i + 1) % segments;
         let c = a + bottom;
         let d = b + bottom;
-        m.triangles.extend([[a, c, b], [b, c, d]]);
+        m.triangles.extend([[a, b, c], [b, d, c]]);
     }
     m.recalculate_normals();
     m

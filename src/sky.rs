@@ -27,7 +27,7 @@ fn hash(mut x: u32) -> u32 {
 }
 impl Skybox {
     pub fn new(seed: u32) -> Self {
-        let size = 192;
+        let size = 512;
         let noise = Noise::new(seed.wrapping_add(71));
         let mut faces = std::array::from_fn(|_| vec![V3::zero(); size * size]);
         for (face, pixels) in faces.iter_mut().enumerate() {
@@ -48,7 +48,7 @@ impl Skybox {
             }
         }
         // Estrellas distribuidas sobre direcciones, proyectadas a las seis caras.
-        for i in 0..6500_u32 {
+        for i in 0..3500_u32 {
             let h = hash(i ^ seed);
             let y = 2. * h as f32 / u32::MAX as f32 - 1.;
             let a = hash(h) as f32 / u32::MAX as f32 * TAU;
@@ -57,13 +57,13 @@ impl Skybox {
             let (face, u, vv) = Self::coordinates(d);
             let x = ((u * 0.5 + 0.5) * size as f32) as i32;
             let y = ((0.5 - vv * 0.5) * size as f32) as i32;
-            let bright = 0.25 + 0.75 * (hash(h.wrapping_add(1)) as f32 / u32::MAX as f32).powi(6);
+            let bright = 0.15 + 0.65 * (hash(h.wrapping_add(1)) as f32 / u32::MAX as f32).powi(6);
             let color = mix(
                 rgb(0x8db9ff),
                 rgb(0xffdfb3),
                 hash(h.wrapping_add(2)) as f32 / u32::MAX as f32,
             );
-            let radius = if bright > 0.8 { 1 } else { 0 };
+            let radius = if bright > 0.75 { 1 } else { 0 };
             for dy in -radius..=radius {
                 for dx in -radius..=radius {
                     let xx = x + dx;

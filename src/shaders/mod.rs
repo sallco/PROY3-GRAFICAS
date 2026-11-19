@@ -277,11 +277,11 @@ fn earth(p: V3, normal: V3, light: V3, view: V3, time: f32, n: &Noise) -> V3 {
     let day = normal.dot(light).max(0.);
     if p.y < 0.04 {
         let grain = n.sample(p * 30.) * 0.5 + 0.5;
-        return mix(rgb(0x141a28), rgb(0x5a6171), grain) * (0.2 + 0.8 * day);
+        return mix(rgb(0x141a28), rgb(0x5a6171), grain) * (0.38 + 0.62 * day);
     }
     let lon = p.z.atan2(p.x).to_degrees();
     let lat = 90. - r * 180.;
-    let ground = land(lon + n.sample(p * 18.) * 2., lat + n.sample(p * 23.) * 1.5);
+    let ground = land(lon + n.sample(p * 18.) * 4., lat + n.sample(p * 23.) * 3.);
     let base = if r > 0.91 {
         mix(rgb(0x9caebf), rgb(0xebfaff), n.sample(p * 52.) * 0.5 + 0.5)
     } else if ground {
@@ -296,5 +296,5 @@ fn earth(p: V3, normal: V3, light: V3, view: V3, time: f32, n: &Noise) -> V3 {
         n.sample(v(p.x * 13. + time * 0.022, p.z * 13., time * 0.01)),
     ) * (0.55 + 0.45 * (p.z * 60. + n.sample(p * 17.) * 3.).sin());
     let spec = normal.dot(unit(light + view)).max(0.).powf(50.) * if ground { 0.05 } else { 0.5 };
-    mix(base, rgb(0xe3f4ff), cloud * 0.7) * (0.22 + 0.78 * day) + rgb(0x9acde5) * spec * day
+    mix(base, rgb(0xe3f4ff), cloud * 0.7) * (0.55 + 0.45 * day) + rgb(0x9acde5) * spec * day
 }
