@@ -404,12 +404,12 @@ pub fn resolve_scene(
                     contact = Some(n);
                 }
             } else {
-                let radius = w.radius * if w.kind == Kind::Volcanic { 1.08 } else { 1. };
+                let radius = w.radius * crate::terrain::surface_bound(w.kind);
                 let (p, n) = resolve_sphere(from, position, old, now, radius + padding);
                 position = p;
                 contact = contact.or(n);
             }
-            if (position - now).length() < w.radius + 2. {
+            if (position - now).length() < w.radius * crate::terrain::surface_bound(w.kind) + 2. {
                 let transform = scene.transform(i, time);
                 let old_transform = scene.transform(i, old_time);
                 for instance in &scene.instances[i] {

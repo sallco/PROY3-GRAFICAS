@@ -52,7 +52,7 @@ fn subdivision_adds_geometry_and_preserves_unit_radius() {
         );
     }
     assert!(
-        s.volcanic[2]
+        s.terrain_meshes[1][3]
             .vertices
             .iter()
             .any(|p| (p.position.length() - 1.).abs() > 0.01)
@@ -67,7 +67,7 @@ fn distribution_is_reproducible_and_seed_sensitive() {
     for (x, y) in a.iter().zip(&b) {
         assert_eq!(x.transform.position, y.transform.position);
         assert_eq!(x.transform.scale, y.transform.scale);
-        assert!(x.transform.y.dot(unit(x.transform.position)) > 0.99);
+        assert!(x.transform.y.dot(unit(x.transform.position)) > 0.7);
     }
     assert!(
         a.iter()
@@ -84,7 +84,7 @@ fn instances_follow_curvature_and_rotation() {
     let position = b.point(p.position);
     assert!((b.inverse(position) - p.position).length() < 1e-5);
     assert!((a.vector(p.position) - b.vector(p.position)).length() > 0.01);
-    assert!(unit(position - b.position).dot(b.vector(p.y)) > 0.99);
+    assert!(unit(position - b.position).dot(b.vector(p.y)) > 0.7);
 }
 #[test]
 fn simulation_is_consistent_at_different_presentation_rates() {
@@ -395,4 +395,28 @@ fn optimized_ship_preserves_original_axis_convention() {
     for axis in 0..3 {
         assert!((extent(&original, axis) - extent(&scene().ship, axis)).abs() < 0.15);
     }
+}
+
+#[test]
+fn detailed_terrain_stays_inside_navigation_bounds() {
+    let s = scene();
+    assert_eq!(s.spheres[3].triangles.len(), 12288);
+    for (i, world) in s.config.worlds.iter().enumerate() {
+        if world.kind == Kind::Flat {
+            continue;
+        }
+        assert!(s.terrain_meshes[i][3].vertices.iter().all(|p|p.position.length()<=nadir::terrain::surface_bound(world.kind)+0.00001));
+    }
+    let mesh = &s.terrain_meshes[1][3];
+    let lo = mesh
+        .vertices
+        .iter()
+        .map(|p| p.position.length())
+        .fold(f32::INFINITY, f32::min);
+    let hi = mesh
+        .vertices
+        .iter()
+        .map(|p| p.position.length())
+        .fold(f32::NEG_INFINITY, f32::max);
+    assert!(hi - lo > 0.22, "relieve insuficiente: {lo}..{hi}");
 }

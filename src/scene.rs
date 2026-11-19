@@ -14,7 +14,7 @@ pub struct Instance {
 pub struct Scene {
     pub config: Config,
     pub spheres: Vec<Mesh>,
-    pub volcanic: Vec<Mesh>,
+    pub terrain_meshes: Vec<Vec<Mesh>>,
     pub flat: Vec<Mesh>,
     pub models: Vec<Mesh>,
     pub ship: Mesh,
@@ -30,17 +30,27 @@ impl Scene {
         let base = Mesh::load(root.join("sphere.obj"))?.sphere();
         let middle = base.subdivide();
         let high = middle.subdivide();
-        let spheres = vec![base, middle, high];
+        let close = high.subdivide();
+        let spheres = vec![base, middle, high, close];
         let noise = Noise::new(config.seed);
-        let volcanic = spheres
+        let terrain_meshes = config
+            .worlds
             .iter()
-            .map(|m| {
-                let mut m = m.clone();
-                for p in &mut m.vertices {
-                    p.position *= terrain_height(&noise, p.position);
-                }
-                m.recalculate_normals();
-                m
+            .map(|w| {
+                spheres
+                    .iter()
+                    .map(|base| {
+                        let mut mesh = base.clone();
+                        for vertex in &mut mesh.vertices {
+                            vertex.position *=
+                                crate::terrain::world_height(&noise, w.kind, vertex.position);
+                        }
+                        if w.kind != Kind::Gas && w.kind != Kind::Flat {
+                            mesh.recalculate_normals();
+                        }
+                        mesh
+                    })
+                    .collect()
             })
             .collect();
         let ship_path = root.join("nave-vuelo.obj");
@@ -59,7 +69,7 @@ impl Scene {
         Ok(Self {
             config,
             spheres,
-            volcanic,
+            terrain_meshes,
             flat: vec![disk(32, 8), disk(64, 16), disk(128, 32)],
             models: surface_models(),
             ship,
@@ -95,9 +105,11 @@ impl Scene {
                 * h as f32
                 / (camera.fov * 0.5).tan();
             let old = self.levels[i];
-            self.levels[i] = if !self.lod || pixels > if old == 2 { 110. } else { 145. } {
+            self.levels[i] = if !self.lod || pixels > if old >= 3 { 180. } else { 220. } {
+                3
+            } else if pixels > if old >= 2 { 80. } else { 105. } {
                 2
-            } else if pixels > if old >= 1 { 30. } else { 42. } {
+            } else if pixels > if old >= 1 { 25. } else { 34. } {
                 1
             } else {
                 0
@@ -108,7 +120,7 @@ impl Scene {
         let mut calls = Vec::new();
         if !nucleus {
             calls.push(DrawCall {
-                mesh: &self.spheres[2],
+                mesh: &self.spheres[3],
                 transform: Transform::new(V3::zero(), self.config.star_radius, time as f32 * 0.04),
                 material: 0,
                 object: usize::MAX,
@@ -120,16 +132,15 @@ impl Scene {
                 let level = self.levels[i];
                 let transform = self.transform(i, time);
                 let mesh = match w.kind {
-                    Kind::Volcanic => &self.volcanic[level],
-                    Kind::Flat => &self.flat[level],
-                    _ => &self.spheres[level],
+                    Kind::Flat => &self.flat[level.min(2)],
+                    _ => &self.terrain_meshes[i][level],
                 };
                 calls.push(DrawCall {
                     mesh,
                     transform,
                     material: w.kind.material(),
                     object: i,
-                    radius: w.radius * 1.1,
+                    radius: w.radius * crate::terrain::surface_bound(w.kind),
                     double_sided: false,
                 });
                 if w.kind == Kind::Gas {
@@ -182,7 +193,7 @@ impl Scene {
     }
 }
 pub fn terrain_height(noise: &Noise, p: V3) -> f32 {
-    1. + noise.sample(p * 4.) * 0.055 + noise.sample(p * 11.) * 0.018
+    crate::terrain::world_height(noise, Kind::Volcanic, p)
 }
 pub fn generate_instances(noise: &Noise, kind: Kind, count: usize) -> Vec<Instance> {
     let model = match kind {
@@ -202,12 +213,8 @@ pub fn generate_instances(noise: &Noise, kind: Kind, count: usize) -> Vec<Instan
         if noise.sample(dir * 3.7) < -0.15 {
             continue;
         }
-        let radius = if kind == Kind::Volcanic {
-            terrain_height(noise, dir)
-        } else {
-            1.
-        };
-        let up = if kind == Kind::Volcanic {
+        let radius = crate::terrain::world_height(noise, kind, dir);
+        let up = {
             let e = 0.001;
             let axis = if dir.y.abs() < 0.9 {
                 v(0., 1., 0.)
@@ -218,14 +225,12 @@ pub fn generate_instances(noise: &Noise, kind: Kind, count: usize) -> Vec<Instan
             let b = dir.cross(t);
             let sample = |d| {
                 let d = unit(d);
-                d * terrain_height(noise, d)
+                d * crate::terrain::world_height(noise, kind, d)
             };
             unit(
                 (sample(dir + b * e) - sample(dir - b * e))
                     .cross(sample(dir + t * e) - sample(dir - t * e)),
             )
-        } else {
-            dir
         };
         let up = if up.dot(dir) < 0. { -up } else { up };
         let axis = if up.y.abs() < 0.9 {
@@ -241,7 +246,15 @@ pub fn generate_instances(noise: &Noise, kind: Kind, count: usize) -> Vec<Instan
                 x,
                 y: up,
                 z,
-                scale: 0.24 + 0.18 * (noise.sample(dir * 17.) * 0.5 + 0.5),
+                scale: {
+                    let variation = noise.sample(dir * 17.) * 0.5 + 0.5;
+                    match kind {
+                        Kind::Ice => 0.65 + 0.38 * variation,
+                        Kind::Forest => 0.40 + 0.25 * variation,
+                        Kind::Desert => 0.40 + 0.30 * variation,
+                        _ => 0.32 + 0.26 * variation,
+                    }
+                },
             },
             model,
         });

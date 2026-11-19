@@ -90,3 +90,57 @@ pub fn flat_height(p: V3) -> f32 {
     };
     0.07 + relief + 0.055 * (a * 9.).sin().abs() * r.powi(8)
 }
+
+/// Límite radial compartido entre descarte y protección de vuelo.
+pub fn surface_bound(kind: crate::config::Kind) -> f32 {
+    use crate::config::Kind;
+    match kind {
+        Kind::Volcanic => 1.38,
+        Kind::Forest => 1.07,
+        Kind::Ice => 1.1,
+        Kind::Desert => 1.08,
+        _ => 1.1,
+    }
+}
+pub fn volcanic_vents(p: V3) -> (f32, f32) {
+    let mut cone = 0_f32;
+    let mut crater = 0_f32;
+    for center in [v(0.45, 0.8, 0.4), v(-0.7, 0.2, -0.6), v(0.2, -0.85, 0.5)] {
+        let d = (p - unit(center)).length();
+        cone = cone.max(1. - crate::shaders::procedural::smooth(0.04, 0.38, d));
+        crater = crater.max(1. - crate::shaders::procedural::smooth(0.035, 0.11, d));
+    }
+    (cone, crater)
+}
+pub fn salt_basin(p: V3) -> f32 {
+    let d = (p - unit(v(0.7, 0.3, 0.64))).length();
+    (-d * d / 0.075).exp()
+}
+pub fn world_height(
+    noise: &crate::shaders::procedural::Noise,
+    kind: crate::config::Kind,
+    p: V3,
+) -> f32 {
+    use crate::config::Kind;
+    match kind {
+        Kind::Forest => 1. + 0.04 * noise.sample(p * 3.) + 0.018 * noise.sample(p * 9.),
+        Kind::Volcanic => {
+            let (cone, crater) = volcanic_vents(p);
+            let macro_relief = noise.sample(p * 1.9) * 0.26;
+            let ridges = (1. - noise.sample(p * 5.2).abs()).powi(5) * 0.16;
+            let fractured = noise.sample(p * 14.) * 0.045;
+            (0.95 + macro_relief + ridges + fractured + cone * 0.28 - crater * 0.16)
+                .clamp(0.76, 1.38)
+        }
+        Kind::Ice => {
+            1. + 0.04 * (1. - noise.sample(p * 5.).abs())
+                + 0.025 * (p.y * 17. + noise.sample(p * 3.) * 3.).sin().abs()
+        }
+        Kind::Desert => {
+            1. + 0.024 * (p.y * 34. + noise.sample(p * 3.) * 4.).sin()
+                + 0.015 * noise.sample(p * 11.)
+                - 0.11 * salt_basin(p)
+        }
+        _ => 1.,
+    }
+}
