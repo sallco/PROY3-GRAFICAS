@@ -311,3 +311,60 @@ fn original_ship_loads_without_unused_export_vertices() {
     assert_eq!(mesh.triangles.len(), 116480);
     assert_eq!(mesh.vertices.len(), 58324);
 }
+
+#[test]
+fn normal_mapping_changes_visible_color_without_changing_depth() {
+    let mut config = scene().config.clone();
+    config.width = 320;
+    config.height = 180;
+    let mut app = App::new(Scene::new(config).unwrap());
+    let c = app.showcase(2, 12.);
+    app.render_view(c, None, false, 12., None);
+    let colors = app.fb.pixels.clone();
+    let depths = app.fb.depths.clone();
+    app.materials.normal_mapping = false;
+    app.render_view(c, None, false, 12., None);
+    assert_eq!(depths, app.fb.depths);
+    let changed = colors
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .zip(app.fb.pixels.as_chunks::<4>().0)
+        .filter(|(a, b)| a != b)
+        .count();
+    assert!(changed > 200);
+}
+
+#[test]
+fn animated_materials_change_at_fixed_geometry() {
+    let s = scene();
+    let mut materials = nadir::shaders::Materials::new(&s.noise);
+    materials.normal_mapping = false;
+    for (object, material) in [(0, 1), (1, 2), (3, 4)] {
+        let mut change = 0.;
+        for i in 0..128 {
+            let a = i as f32 * 2.399963;
+            let y = 1. - 2. * (i as f32 + 0.5) / 128.;
+            let r = (1. - y * y).sqrt();
+            let q = v(r * a.cos(), y, r * a.sin());
+            let transform = s.transform(object, 0.);
+            let world = transform.point(q);
+            let f = nadir::renderer::Fragment {
+                local: q,
+                world,
+                normal: transform.vector(q),
+                material,
+                object,
+            };
+            let before = materials.shade(&f, s, world + q * 10., 0.);
+            let after = materials.shade(&f, s, world + q * 10., 3.);
+            assert!(
+                [before.x, before.y, before.z, after.x, after.y, after.z]
+                    .iter()
+                    .all(|v| v.is_finite())
+            );
+            change += (before - after).length();
+        }
+        assert!(change > 0.2, "material {material}: {change}");
+    }
+}
