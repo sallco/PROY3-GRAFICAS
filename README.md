@@ -16,12 +16,12 @@ La exploración comienza frente a Mneme. La nave puede aproximarse, rodear el pl
 
 | Mundo | Identidad |
 | --- | --- |
-| **Mneme** | Bosque de árboles anulares, suelo oscuro y redes bioluminiscentes animadas. |
-| **Obsidia** | Corteza volcánica deformada, agujas de basalto y corrientes térmicas en grietas de lava. |
-| **Prisma** | Hielo fracturado, cristales facetados y respuesta especular con mapeo de normales. |
-| **Artaud** | Gigante de bandas atmosféricas, vórtice localizado y anillos inclinados. |
-| **Palimpsesto** | Dunas minerales, interferencias luminosas y monolitos orientados sobre la superficie. |
-| **Tierra Plana** | Disco de océanos y continentes, relieve continental, nubes, borde helado y estratos rocosos inferiores. |
+| **Mneme** | Bosque de copas anulares escalonadas, colinas verdes y lagunas violetas con bioluminiscencia tenue. |
+| **Obsidia** | Macizo volcánico fracturado: crestas irregulares, conos con calderas, agujas de basalto y lava naranja animada. |
+| **Prisma** | Glaciares blancos, grietas azul profundo y grandes agujas cristalinas con reflejos violetas. |
+| **Artaud** | Atmósfera de bandas ámbar y malva, tormenta oscura en espiral y tres anillos separados. |
+| **Palimpsesto** | Desierto de cobre: campos de dunas, roca expuesta, una cuenca salina y pórticos de observatorio. |
+| **Tierra Plana** | Disco de océanos y continentes, relieve continental, nubes, borde helado y una base rocosa cónica y puntiaguda. |
 
 | Mneme | Obsidia |
 | --- | --- |
@@ -30,6 +30,10 @@ La exploración comienza frente a Mneme. La nave puede aproximarse, rodear el pl
 | ![Prisma](docs/imagenes/prisma.png) | ![Artaud](docs/imagenes/artaud.png) |
 | **Palimpsesto** | **Tierra Plana** |
 | ![Palimpsesto](docs/imagenes/palimpsesto.png) | ![Tierra Plana](docs/imagenes/tierra-plana.png) |
+
+**Mneme** es el nombre del planeta-bosque. Su concepto es un archivo vivo: las copas anulares evocan capas de crecimiento y las lagunas violetas separan las regiones de vegetación. La identidad de cada mundo se apoya en relieve, escala de objetos y respuesta del material, además de su paleta.
+
+El sol utiliza granulación blanca y dorada, halo cálido y resplandor calculado en CPU. [Ver el sol](docs/imagenes/sol.png). La base de Tierra Plana puede observarse [desde abajo](docs/imagenes/tierra-plana-inferior.png).
 
 **Umbra** ocupa una región distinta del sistema planetario. El botón de viaje o la tecla `G` activa una secuencia de warping y conduce al agujero negro supermasivo del núcleo galáctico. Allí se conserva el vuelo libre. Un segundo salto devuelve la nave al sistema, cuya simulación continúa durante la expedición.
 
@@ -128,7 +132,7 @@ cargo clippy --locked --all-targets -- -D warnings
 cargo build --release --locked
 ```
 
-Las **25 pruebas automatizadas** cubren clipping, profundidad entre objetos, recursos, generación de geometría, semillas, orientación de instancias, equivalencia temporal, gravedad, colisiones, pausa, viaje de ida y vuelta y equivalencia de imagen con/sin descarte.
+Las **31 pruebas automatizadas** cubren clipping, profundidad entre objetos, recursos, generación de geometría, semillas, orientación de instancias, equivalencia temporal, gravedad, colisiones, pausa, viaje de ida y vuelta y equivalencia de imagen con/sin descarte.
 
 La nave de vuelo conserva el modelo original y reduce sus **116 480 triángulos a 3261**. La generación puede repetirse con Blender:
 

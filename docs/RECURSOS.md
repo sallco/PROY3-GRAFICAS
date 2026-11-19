@@ -13,9 +13,9 @@ Se empleó asistencia de IA para planificación, implementación, pruebas, revis
 | `assets/models/nave-original.obj` | Modelo original propio, conservado sin modificaciones: 58 384 vértices en el archivo y 116 480 triángulos. El cargador omite 60 vértices sin caras al construir la malla. |
 | `assets/models/nave-vuelo.obj` | Derivación optimizada del mismo modelo: 1647 vértices y 3261 triángulos. Mantiene el original en el repositorio. |
 | `assets/models/sphere.obj` | Esfera inicial proporcionada para el curso: 98 vértices y 192 triángulos. El programa normaliza y subdivide su geometría. |
-| `assets/models/superficie/*.obj` | Árbol, basalto, cristal y monolito generados mediante código propio. Son exportaciones de referencia; la aplicación construye esas mallas al iniciar. |
+| `assets/models/superficie/*.obj` | Árbol de copas escalonadas, basalto, cristal y pórtico de observatorio (`monolito.obj`) generados mediante código propio. Son exportaciones de referencia; la aplicación construye esas mallas al iniciar. |
 | Mundos, disco terrestre y anillos | Generación propia en CPU durante la preparación de escena. |
-| Materiales, mapa normal y cielo | Generados proceduralmente; no se cargan imágenes externas de textura. |
+| Materiales, mapa normal, resplandor solar y cielo | Generados proceduralmente; no se cargan imágenes externas de textura. |
 | `docs/imagenes/*.png` | Imágenes calculadas por el renderer y capturas de la aplicación. |
 | `docs/video/nadir.mp4` | Video del renderer, codificado con FFmpeg y rótulos mediante DejaVu Sans del sistema de generación. No requiere esa fuente para reproducirse. |
 | `docs/evidencia/benchmark.csv` | Mediciones individuales del modo reproducible de rendimiento. |
