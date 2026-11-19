@@ -1,5 +1,6 @@
 use crate::{config::Kind, math::*, scene::Scene};
 pub const STEP: f32 = 1. / 120.;
+const FIXED_DT: f64 = 1. / 120.;
 pub const SHIP_RADIUS: f32 = 0.32;
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Input {
@@ -108,10 +109,10 @@ impl Flight {
         let dt = dt.clamp(0., 0.1);
         if !self.paused {
             self.accumulator += dt as f64;
-            while self.accumulator + 1e-10 >= STEP as f64 {
+            while self.accumulator + 1e-10 >= FIXED_DT {
                 self.previous = self.ship;
                 self.tick(scene, input);
-                self.accumulator -= STEP as f64;
+                self.accumulator -= FIXED_DT;
             }
             if let Some(t) = self.warp.as_mut() {
                 *t += dt;
@@ -145,7 +146,7 @@ impl Flight {
                 }
             }
         }
-        let alpha = (self.accumulator / STEP as f64).clamp(0., 1.) as f32;
+        let alpha = (self.accumulator / FIXED_DT).clamp(0., 1.) as f32;
         let position =
             self.previous.position + (self.ship.position - self.previous.position) * alpha;
         let desired = position - self.ship.forward * 2.8 + self.ship.up * 1.05;
@@ -176,7 +177,7 @@ impl Flight {
     }
     fn tick(&mut self, scene: &Scene, input: Input) {
         let old_time = self.time;
-        self.time += STEP as f64;
+        self.time += FIXED_DT;
         if self.warp.is_some() {
             self.ship.velocity *= (-STEP * 3.).exp();
             return;
