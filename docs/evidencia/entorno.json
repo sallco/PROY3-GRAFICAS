@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-19",
+  "cpu": "AMD Ryzen 7 7445HS",
+  "logical_cpus": 12,
+  "os": "Linux-7.2.11-zen1-1-zen-x86_64-with-glibc2.44",
+  "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13) (Arch Linux rust 1:1.99.1-1)",
+  "framebuffer": [
+    768,
+    432
+  ],
+  "frames_per_variant": 72,
+  "warmup_frames": 12,
+  "summary": [
+    {
+      "lod": false,
+      "culling": false,
+      "mean_ms": 24.083,
+      "p95_ms": 32.63,
+      "fps_cpu": 41.52,
+      "mean_triangles": 38884
+    },
+    {
+      "lod": false,
+      "culling": true,
+      "mean_ms": 22.344,
+      "p95_ms": 31.694,
+      "fps_cpu": 44.75,
+      "mean_triangles": 12090
+    },
+    {
+      "lod": true,
+      "culling": false,
+      "mean_ms": 21.584,
+      "p95_ms": 30.281,
+      "fps_cpu": 46.33,
+      "mean_triangles": 14861
+    },
+    {
+      "lod": true,
+      "culling": true,
+      "mean_ms": 21.221,
+      "p95_ms": 29.797,
+      "fps_cpu": 47.12,
+      "mean_triangles": 6906
+    }
+  ]
+}
