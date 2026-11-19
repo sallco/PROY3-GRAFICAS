@@ -288,6 +288,8 @@ pub fn surface_models() -> Vec<Mesh> {
         p.position.y = 1.3 + p.position.y * 0.085;
     }
     monolith.append(&lintel, Transform::new(V3::zero(), 1., 0.));
+    tree.recalculate_normals();
+    monolith.recalculate_normals();
     vec![tree, basalt, ice, monolith]
 }
 
