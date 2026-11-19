@@ -58,7 +58,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             }
             Ok(())
         }
-        "--record-demo" => record_demo(&mut app, &output),
+        "--record-demo" => nadir::demo::record(&mut app, &output),
         _ => interactive(app, &config),
     }
 }
@@ -405,7 +405,4 @@ fn interactive(mut app: App, config: &Path) -> Result<(), Box<dyn std::error::Er
         draw.draw_line(640, 353, 640, 367, Color::new(180, 208, 220, 120));
     }
     Ok(())
-}
-fn record_demo(_app: &mut App, _output: &Path) -> Result<(), Box<dyn std::error::Error>> {
-    Err("Grabación todavía no disponible".into())
 }
