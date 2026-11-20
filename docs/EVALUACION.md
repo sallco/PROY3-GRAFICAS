@@ -8,9 +8,9 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 | --- | --- | --- |
 | Pipeline propio por software | Transformaciones, clipping, rasterización, profundidad, materiales e iluminación en CPU. | `math`, `renderer`, `shaders`; inspeccionar las llamadas de presentación en `main`. |
 | Sol, nave propia controlable y planeta con órbita/rotación temporal | Estrella central, nave OBJ y seis mundos animados mediante tiempo simulado. | Iniciar, volar con `W/A/S/D`, observar el sistema y cambiar `orbit_speed`. |
-| Acercarse, rodear y alejarse sin cambiar escena | Control libre y asistencia local dentro de una escena persistente. | Video 00:00–00:46 y ejecución interactiva. |
+| Acercarse, rodear y alejarse sin cambiar escena | Control libre y asistencia local dentro de una escena persistente. | Video enlazado en el README y ejecución interactiva. |
 | Modelos, transformaciones, profundidad y shader propio | OBJ triangulados, transformaciones por objeto y profundidad compartida; múltiples materiales propios. | Pruebas de profundidad y capturas. |
-| Fuente, recursos, instrucciones y video | Código, originales, mallas generadas, README y MP4 incluidos. | Compilar desde clon limpio y seguir el README. |
+| Fuente, recursos, instrucciones y video | Código, originales, mallas generadas, README y video enlazado. | Compilar desde clon limpio y seguir el README. |
 
 ## Menú del PDF
 
@@ -41,7 +41,7 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 | --- | --- |
 | Dos criterios subjetivos de 30 y 20 puntos | La captura no contiene sus descripciones ampliadas. Se aporta dirección visual coherente, interfaz, recorrido y documentación; no se inventan condiciones adicionales. |
 | Cinco elementos planeta/estrella/luna | Seis planetas y una estrella central; cinco planetas iniciales cubren por sí solos el máximo visible. |
-| Warping animado | `G`, secuencia de tres segundos con distorsión y trazos radiales; video 01:16–01:19 y 01:30–01:33. |
+| Warping animado | `G`, secuencia de tres segundos con distorsión y trazos radiales; verificación en la aplicación y demostración enlazada en el README. |
 | Nave propia que siga a la cámara | La nave permanece visible en tercera persona y la cámara acompaña su posición y orientación durante el vuelo 3D. |
 | Skybox con estrellas | Seis caras procedurales, muestreadas por dirección, con estrellas y banda galáctica. |
 | Condiciones que eviten atravesar elementos | Protección del sol, cuerpos, modelos de superficie y núcleo; cámara también protegida. Los anillos decorativos no se presentan como sólidos. |
@@ -58,22 +58,9 @@ Esta matriz identifica las características implementadas y cómo verificarlas. 
 6. Activar `G`, maniobrar alrededor de Umbra y regresar. Mostrar que el sistema ha seguido evolucionando.
 7. Modificar una semilla o velocidad orbital y usar `R`; explicar el parámetro y restaurar su valor.
 
-## Video incluido
+## Video demostrativo
 
-[Descargar o reproducir el MP4](video/nadir.mp4). Duración: **96 segundos**, 1280 × 720, 24 cuadros/s.
-
-| Intervalo | Contenido |
-| --- | --- |
-| 00:00–00:12 | Vuelo y aproximación mediante entradas al controlador. |
-| 00:12–00:38 | Vuelta completa a Tahiti, sin corte de escena. |
-| 00:38–00:46 | Alejamiento continuo. |
-| 00:46–01:16 | Montaje de los otros cinco mundos; Tierra Plana muestra superficie, borde y punta inferior. |
-| 01:16–01:19 | Warping hacia el núcleo. |
-| 01:19–01:30 | Vuelo en Umbra. |
-| 01:30–01:33 | Regreso al sistema. |
-| 01:33–01:36 | Cierre del recorrido. |
-
-El video es una captura reproducible del renderer con pilotaje programado y un montaje identificado de vistas. No sustituye la demostración de controles ni las comparaciones técnicas en la aplicación.
+La grabación de entrega está enlazada en la sección [Video Demostrativo del README](../README.md#video-demostrativo). La ejecución interactiva permite comprobar los controles y las comparaciones técnicas descritas en este documento.
 
 ## Inspección adicional mediante el museo
 

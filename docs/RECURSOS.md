@@ -17,7 +17,7 @@ Se empleó asistencia de IA para planificación, implementación, pruebas, revis
 | Mundos, disco terrestre y anillos | Generación propia en CPU durante la preparación de escena. |
 | Materiales, mapa normal, resplandor solar y cielo | Generados proceduralmente; no se cargan imágenes externas de textura. |
 | `docs/imagenes/*.png` | Imágenes calculadas por el renderer y capturas de la aplicación. |
-| `docs/video/nadir.mp4` | Video del renderer, codificado con FFmpeg y rótulos mediante DejaVu Sans del sistema de generación. No requiere esa fuente para reproducirse. |
+| Video demostrativo | Adjunto de GitHub enlazado en el README. |
 | `docs/evidencia/benchmark.csv` | Mediciones individuales del modo reproducible de rendimiento. |
 
 Los OBJ pueden conservar referencias `mtllib` de su exportación. El renderer ignora esas referencias y asigna materiales propios; no requiere archivos MTL. Blender puede informar que el MTL original no está disponible al ejecutar la optimización; la exportación geométrica no depende de él.
@@ -39,7 +39,7 @@ Ambas imágenes utilizan la misma cámara, transformación y normalización. La 
 | `noise` 0.9 | OpenSimplex para materiales, deformación y distribución. |
 | `serde` / `toml` | Deserialización y validación de parámetros de escena. |
 | Blender | Herramienta de desarrollo para derivar la nave optimizada; no se necesita para ejecutar. |
-| FFmpeg / DejaVu Sans | Herramientas opcionales para regenerar el video; no se necesitan para el vuelo interactivo. |
+| FFmpeg / DejaVu Sans | Herramientas opcionales para generar recorridos locales; no se necesitan para el vuelo interactivo. |
 
 Las versiones resueltas y licencias declaradas por las dependencias se encuentran en Cargo.lock y sus paquetes. El repositorio no cambia sus condiciones de distribución.
 

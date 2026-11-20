@@ -8,7 +8,7 @@ Seis mundos en movimiento, una nave de exploración y una ruta hacia el núcleo 
 
 **Autor:** sallco · **Modalidad:** individual · **Curso:** Gráficas por Computadora, Universidad del Valle de Guatemala.
 
-[Demostración en video](docs/video/nadir.mp4) · [Arquitectura](docs/ARQUITECTURA.md) · [Evaluación](docs/EVALUACION.md) · [Recursos](docs/RECURSOS.md)
+[Arquitectura](docs/ARQUITECTURA.md) · [Evaluación](docs/EVALUACION.md) · [Recursos](docs/RECURSOS.md)
 
 ## Video Demostrativo 
 
@@ -157,7 +157,7 @@ cargo run --release --locked -- --export-models --output output/modelos
 cargo run --release --locked -- --record-demo --output output/nadir.mp4
 ```
 
-El [video incluido](docs/video/nadir.mp4) se genera con el mismo renderer. Sus primeros 46 segundos utilizan entradas calculadas para el controlador de vuelo: aproximación, vuelta completa a Tahiti y alejamiento continuo. Continúa con un montaje de los otros mundos y el viaje de ida y vuelta a Umbra. Los rótulos y la codificación del video se aplican con FFmpeg. Este recorrido reproducible complementa la ejecución interactiva.
+La opción `--record-demo` permite generar localmente un recorrido reproducible de 96 segundos en `output/`.
 
 ## Verificación
 
