@@ -182,6 +182,6 @@ Los resultados de rendimiento, sus condiciones y sus límites se detallan en [ar
 
 Proyecto individual de **sallco** (`dcalderon918@gmail.com`): nave, implementación, materiales, modelos procedurales, integración y documentación. La esfera inicial es un recurso geométrico proporcionado para el curso. No se necesitan imágenes de texturas ni paquetes artísticos descargados.
 
-Se utilizó como apoyo y guía el agente de código de OpenAI Codex.
+Se utilizó asistencia de IA en la planificación, implementación, revisión y documentación. Esta declaración se incluye conforme a las especificaciones de entrega; no atribuye coautoría académica. El código y los algoritmos deben poder explicarse durante la evaluación.
 
 La procedencia de archivos, las dependencias y los procedimientos de generación se describen en [recursos](docs/RECURSOS.md).
