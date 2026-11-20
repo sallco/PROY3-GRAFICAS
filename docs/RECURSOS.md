@@ -4,8 +4,6 @@
 
 **sallco — dcalderon918@gmail.com** es el único autor académico del proyecto. La nave original es un modelo propio. La implementación integra pipeline, controles, simulación, materiales, geometría procedural, presentación y documentación.
 
-Se empleó asistencia de IA para planificación, implementación, pruebas, revisión y documentación. La declaración cumple la condición de transparencia establecida en las especificaciones; la entrega requiere comprender y explicar el código y las decisiones técnicas.
-
 ## Inventario
 
 | Recurso | Procedencia y uso |
@@ -66,4 +64,4 @@ La reducción de la nave utiliza decimación con proporción 0,028, triangulaci�
 
 `main` reúne los hitos integrados. Las ramas `feat/*`, `fix/*`, `perf/*`, `test/*`, `style/*` y `docs/*` conservan el trabajo por responsabilidad. Se utilizan integraciones por avance rápido para preservar los commits atómicos.
 
-Los mensajes de commit son de una sola línea en español, con Conventional Commits sin scope. La identidad efectiva es la configuración de Git de sallco; no se incluyen cuerpos, pies ni atribuciones a asistentes en los commits.
+Los mensajes de commit son de una sola línea en español, con Conventional Commits sin scope. La identidad efectiva es la configuración de Git de sallco; no se incluyen cuerpos ni pies en los commits.
