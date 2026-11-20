@@ -10,6 +10,11 @@ Seis mundos en movimiento, una nave de exploración y una ruta hacia el núcleo 
 
 [Demostración en video](docs/video/nadir.mp4) · [Arquitectura](docs/ARQUITECTURA.md) · [Evaluación](docs/EVALUACION.md) · [Recursos](docs/RECURSOS.md)
 
+## Video Demostrativo 
+
+https://github.com/user-attachments/assets/90a5f178-2f91-4220-9593-214b02cb12ae
+
+
 ## La experiencia
 
 La exploración comienza frente a Tahiti. La nave puede aproximarse, rodear el planeta y alejarse sin cambiar de escena. La asistencia local facilita maniobrar cerca de las superficies; el impulso de crucero permite recorrer el sistema. Las órbitas, la rotación, la gravedad y los materiales continúan evolucionando durante el vuelo.
