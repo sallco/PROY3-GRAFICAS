@@ -10,6 +10,8 @@ Seis mundos en movimiento, una nave de exploración y una ruta hacia el núcleo 
 
 [Arquitectura](docs/ARQUITECTURA.md) · [Evaluación](docs/EVALUACION.md) · [Recursos](docs/RECURSOS.md)
 
+Enlace a Youtube para el video demostrativo (en caso falle en el reproductor nativo de GitHub): https://youtu.be/JlKQXNiy2DQ
+
 ## Video Demostrativo 
 
 https://github.com/user-attachments/assets/90a5f178-2f91-4220-9593-214b02cb12ae
